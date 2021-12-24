@@ -23,7 +23,7 @@ func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
 	}
 	return pct, nil
 }
-func (p *PacientDB) GetByUch(snilsdoc []string) ([]*Pacient, error) {
+func (p *PacientDB) GetByUch(snilsdoc []string, params []string) ([]*Pacient, error) {
 	pcts := make([]*Pacient, 0)
 	if len(snilsdoc) == 1 {
 		stmt := `SELECT pid, enp, surname, name, patronymic, birthday,
@@ -71,7 +71,6 @@ func (p *PacientDB) GetByUch(snilsdoc []string) ([]*Pacient, error) {
 
 	return pcts, nil
 }
-
 func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
 	stmt := `INSERT INTO main 
 		 (pid, enp, surname, name, patronymic, birthday, gender, snils, placebirth, 
@@ -87,7 +86,6 @@ func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
 	return nil
 
 }
-
 func (p *PacientDB) InnsertOne(prikrep interface{}) error {
 	stmt := "INSERT INTO main (pid) VALUES($1);"
 	_, err := p.DB.Exec(context.Background(), stmt, prikrep)

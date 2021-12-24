@@ -2,13 +2,11 @@ package view
 
 import (
 	"fmt"
-	"github.com/clovuss/population/models"
 	"html/template"
 	"net/http"
 )
 
 type View struct {
-	Record       []*models.Pacient
 	NumUch       int
 	Pid          string
 	Enp          string
@@ -18,24 +16,36 @@ type View struct {
 	Snils        string
 	Placeofbirth string
 	RegionName   string
-	City         string
-	NasPunkt     string
-	Street       string
-	House        string
-	Korp         string
-	Kvart        string
+	Adress       string
 	PrikAuto     string
 	PrikDate     string
 	SnilsDoc     string
 }
 
-func (v *View) RenderHTML(w http.ResponseWriter, s *View) {
-	tem, err := template.ParseFiles("./ui/html/base.html",
+func Construct(params map[string]string, uch int) *View {
+	v := &View{
+		NumUch:   uch,
+		Fio:      "on",
+		Birthday: params["checkBirthday"],
+		Enp:      params["checkEnp"],
+		Snils:    params["checkSnils"],
+		Adress:   params["checkAdress"],
+		PrikDate: params["checkPrikrepdate"],
+		PrikAuto: params["checkPrikreptype"],
+	}
+	return v
+}
+func (v *View) RenderHTML(w http.ResponseWriter) {
+	tem, err := template.ParseFiles(
+		"./ui/html/base.html",
 		"./ui/html/ranger.html")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	tem.Execute(w, s)
+	err = tem.Execute(w, v)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }

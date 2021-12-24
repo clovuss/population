@@ -13,7 +13,7 @@ func (app *application) home(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	r, err := app.LinkDB.GetByPid("65")
+	r, err := app.Repo.GetByPid("65")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -25,12 +25,17 @@ func (app *application) home(w http.ResponseWriter, req *http.Request) {
 
 }
 func (app *application) view(w http.ResponseWriter, req *http.Request) {
-	//tem, err := template.ParseFiles("./ui/html/base.html",
-	//	"./ui/html/ranger.html")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	req.ParseForm()
+	err := req.ParseForm()
+	if err != nil {
+		fmt.Println(err)
+	}
+	paramsUser := make(map[string]string, 0)
+	paramsUser["checkBirthday"] = req.Form.Get("birthday")
+	paramsUser["checkEnp"] = req.Form.Get("enp")
+	paramsUser["checkSnils"] = req.Form.Get("snils")
+	paramsUser["checkAdress"] = req.Form.Get("adress")
+	paramsUser["checkPrikreptype"] = req.Form.Get("prikreptype")
+	paramsUser["checkPrikrepdate"] = req.Form.Get("prikrepdate")
 	numberUch, err := strconv.Atoi(req.URL.Path[len("/view/"):])
 	if err != nil {
 		fmt.Println(err)
@@ -39,20 +44,10 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		http.NotFound(w, req)
 		return
 	}
-	rec, err := app.LinkDB.GetByUch(app.snilsdoc[numberUch])
-	v := view.View{
-		Record: rec,
-		NumUch: numberUch,
-		Fio:    "on",
-	}
-	v.RenderHTML(w, &v)
-
+	vs := view.Construct(paramsUser, numberUch)
+	vs.RenderHTML(w)
 	if err != nil {
 		fmt.Println(err)
 	}
-	//err = tem.Execute(w, p)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
 
 }

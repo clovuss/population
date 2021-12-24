@@ -1,36 +1,39 @@
 {{define "ranger"}}
+<!-- <details> -->
+<!-- <summary>Выбор полей</summary> -->
     <form method="get" action="/view/{{.NumUch}}">
     <div>
         <input type="checkbox"  name="fio"  checked>
         <label for="scales">ФИО</label>
     </div>
     <div>
-        <input type="checkbox"  name="birthday" >
+        <input type="checkbox"  name="birthday" {{ if .Birthday}} checked {{end}} >
         <label for="scales">Дата рождения</label>
     </div>
         <div>
-            <input type="checkbox"  name="enp" >
+            <input type="checkbox"  name="enp" {{ if .Enp}} checked {{end}}>
             <label for="scales">ЕНП</label>
         </div>
         <div>
-            <input type="checkbox"  name="snils" >
+            <input type="checkbox"  name="adress"  {{ if .Adress}} checked {{end}} >
             <label for="scales">СНИЛС</label>
         </div>
         <div>
-            <input type="checkbox"  name="scales" >
-            <label for="scales">Дата рождения</label>
+            <input type="checkbox"  name="snils" {{ if .Snils}} checked {{end}} >
+            <label for="scales">Адрес</label>
         </div>
         <div>
-            <input type="checkbox"  name="scales" >
-            <label for="scales">Дата рождения</label>
+            <input type="checkbox"  name="prikreptype" {{ if .PrikAuto}} checked {{end}}>
+            <label for="scales">Тип прикрепления </label>
         </div>
         <div>
-            <input type="checkbox"  name="scales" >
-            <label for="scales">Дата рождения</label>
+            <input type="checkbox"  name="prikrepdate" {{ if .PrikDate}} checked {{end}}>
+            <label for="scales">Дата прикрепления</label>
         </div>
         <input type="reset" value="Поля по умолчанию">
         <input type="submit" value="Сформировать">
     </form>
+<!--     </details> -->
     {{range .Record}}
         {{.Surname}}  {{.Name}} {{.Patronymic}} {{.Birthday}} <br>
     {{end}}

@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"github.com/clovuss/population/models"
 	"github.com/clovuss/population/preparedata"
+	"github.com/clovuss/population/view"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"net/http"
 )
 
 type application struct {
 	popXML   map[string]preparedata.PRIKREP
-	LinkDB   *models.PacientDB
+	Repo     *models.PacientDB
 	snilsdoc map[int][]string
+	View     *view.View
 }
 
 func main() {
@@ -20,7 +22,7 @@ func main() {
 	dbpool := openDb(dsn)
 	defer dbpool.Close()
 	app := application{
-		LinkDB: &models.PacientDB{DB: dbpool},
+		Repo: &models.PacientDB{DB: dbpool},
 		snilsdoc: map[int][]string{
 			1:  {"037-431-051 26"},
 			2:  {"173-024-614 35", "171-395-174 75"},
