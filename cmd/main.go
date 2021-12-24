@@ -6,11 +6,13 @@ import (
 	"github.com/clovuss/population/models"
 	"github.com/clovuss/population/preparedata"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"net/http"
 )
 
 type application struct {
-	popXML map[string]preparedata.PRIKREP
-	LinkDB *models.PacientDB
+	popXML   map[string]preparedata.PRIKREP
+	LinkDB   *models.PacientDB
+	snilsdoc map[int][]string
 }
 
 func main() {
@@ -18,13 +20,29 @@ func main() {
 	dbpool := openDb(dsn)
 	defer dbpool.Close()
 	app := application{
-		LinkDB: &models.PacientDB{DB: dbpool}}
-	app.popXML = preparedata.ImprooveDataPrepare("14")
-	w, err := app.LinkDB.GetByPid("65")
-	if err != nil {
-		fmt.Println(err)
+		LinkDB: &models.PacientDB{DB: dbpool},
+		snilsdoc: map[int][]string{
+			1:  {"037-431-051 26"},
+			2:  {"173-024-614 35", "171-395-174 75"},
+			3:  {"037-431-166 36"},
+			4:  {"139-926-189 10"},
+			5:  {"121-876-460 62"},
+			6:  {"037-431-155 33"},
+			7:  {"037-431-143 29"},
+			8:  {"037-431-139 33"},
+			9:  {"036-579-107 76"},
+			10: {"037-431-141 27"},
+			11: {"171-395-174 75", "173-024-614 35"},
+			12: {"037-431-161 31"},
+		},
 	}
-	fmt.Println((*w).Birthday)
+	app.popXML = preparedata.ImprooveDataPrepare("14")
+	server := http.Server{
+		Addr:      ":8080",
+		Handler:   app.routes(),
+		TLSConfig: nil,
+		ErrorLog:  nil,
+	}
 
 	//map15 := improoveDataPrepare("15")
 	//
@@ -35,6 +53,10 @@ func main() {
 	//		fmt.Println(k)
 	//	}
 	//}
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }
 func openDb(dsn string) *pgxpool.Pool {

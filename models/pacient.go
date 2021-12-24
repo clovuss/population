@@ -20,6 +20,6 @@ type Pacient struct {
 	Korp         string
 	Kvart        string
 	PrikAuto     string
-	PrikDate     string
+	PrikDate     time.Time
 	SnilsDoc     string
 }

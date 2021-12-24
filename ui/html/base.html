@@ -1,0 +1,29 @@
+{{define "base" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{.Fio}}</title>
+</head>
+<body>
+ выбери участок
+ <a href="/view/1">1</a>
+ <a href="/view/2">2</a>
+ <a href="/view/3">3</a>
+ <a href="/view/4">4</a>
+ <a href="/view/5">5</a>
+ <a href="/view/6">6</a>
+ <a href="/view/7">7</a>
+ <a href="/view/8">8</a>
+ <a href="/view/9">9</a>
+ <a href="/view/10">10</a>
+ <a href="/view/11">11</a>
+ <a href="/view/12">12</a>
+<br>
+{{template "ranger" .}}
+
+
+</body>
+</html>
+{{end}}
+{{template "base" .}}

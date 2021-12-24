@@ -1,0 +1,37 @@
+{{define "ranger"}}
+    <form method="get" action="/view/{{.NumUch}}">
+    <div>
+        <input type="checkbox"  name="fio"  checked>
+        <label for="scales">ФИО</label>
+    </div>
+    <div>
+        <input type="checkbox"  name="birthday" >
+        <label for="scales">Дата рождения</label>
+    </div>
+        <div>
+            <input type="checkbox"  name="enp" >
+            <label for="scales">ЕНП</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="snils" >
+            <label for="scales">СНИЛС</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="scales" >
+            <label for="scales">Дата рождения</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="scales" >
+            <label for="scales">Дата рождения</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="scales" >
+            <label for="scales">Дата рождения</label>
+        </div>
+        <input type="reset" value="Поля по умолчанию">
+        <input type="submit" value="Сформировать">
+    </form>
+    {{range .Record}}
+        {{.Surname}}  {{.Name}} {{.Patronymic}} {{.Birthday}} <br>
+    {{end}}
+{{end}}
