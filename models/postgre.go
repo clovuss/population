@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"fmt"
-
 	"github.com/clovuss/population/preparedata"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -23,54 +22,73 @@ func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
 	}
 	return pct, nil
 }
-func (p *PacientDB) GetByUch(snilsdoc []string, params []string) ([]*Pacient, error) {
+
+func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc ...interface{}) ([]*Pacient, error) {
 	pcts := make([]*Pacient, 0)
-	if len(snilsdoc) == 1 {
-		stmt := `SELECT pid, enp, surname, name, patronymic, birthday,
-       gender, snils, city, naspunkt, street, house, korp, kvart FROm main WHERE snilsdoc=$1 order by surname ;`
-		rows, err := p.DB.Query(context.Background(), stmt, snilsdoc[0])
-		if err != nil {
-			fmt.Println(err)
-		}
-		defer rows.Close()
-		for rows.Next() {
-			pct := &Pacient{}
-			err := rows.Scan(&pct.Pid, &pct.Enp, &pct.Surname, &pct.Name, &pct.Patronymic, &pct.Birthday, &pct.Gender, &pct.Snils, &pct.City, &pct.NasPunkt, &pct.Street, &pct.House,
-				&pct.Korp, &pct.Kvart)
-			if err != nil {
-				fmt.Println(err)
-			}
-			pcts = append(pcts, pct)
-		}
-		if rows.Err() != nil {
-			return nil, err
-		}
-	} else {
-
-		stmt := `SELECT pid, enp, surname, name, patronymic, birthday,
-       gender, snils, city, naspunkt, street, house, korp, kvart FROm main WHERE snilsdoc=$1 OR snilsdoc=$2 order by surname;`
-
-		rows, err := p.DB.Query(context.Background(), stmt, snilsdoc[0], snilsdoc[1])
-		if err != nil {
-			fmt.Println(err)
-		}
-		defer rows.Close()
-		for rows.Next() {
-			pct := &Pacient{}
-			err := rows.Scan(&pct.Pid, &pct.Enp, &pct.Surname, &pct.Name, &pct.Patronymic, &pct.Birthday, &pct.Gender, &pct.Snils, &pct.City, &pct.NasPunkt, &pct.Street, &pct.House,
-				&pct.Korp, &pct.Kvart)
-			if err != nil {
-				fmt.Println(err)
-			}
-			pcts = append(pcts, pct)
-		}
-		if rows.Err() != nil {
-			return nil, err
-		}
+	var rawsqlsring string
+	for k, _ := range params {
+		rawsqlsring += ", " + k
 	}
+	fmt.Println(rawsqlsring)
 
+	//var addsql string
+	stmt := `SELECT surname, name, patronymic,
+		birthday, enp, gender, snils, 
+		city, naspunkt, street, house, korp, kvart, 
+		prikrepdate, prikreptype 
+		FROM main WHERE snilsdoc=$1 order by surname ;`
+	//if len(snilsdoc) == 2 {
+	//addsql = `OR snilsdoc=$2`
+	//
+	//}
+	rows, err := p.DB.Query(context.Background(), stmt, snilsdoc...)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		pct := &Pacient{}
+		err := rows.Scan(&pct.Surname, &pct.Name, &pct.Patronymic,
+			&pct.Birthday, &pct.Enp, &pct.Gender, &pct.Snils,
+			&pct.City, &pct.NasPunkt, &pct.Street, &pct.House, &pct.Korp, &pct.Kvart,
+			&pct.PrikDate, &pct.PrikAuto)
+		if err != nil {
+			fmt.Println(err)
+		}
+		pcts = append(pcts, pct)
+	}
+	if rows.Err() != nil {
+		return nil, err
+	}
 	return pcts, nil
 }
+
+//else {
+//
+//	stmt := `SELECT pid, enp, surname, name, patronymic, birthday,
+//   gender, snils, city, naspunkt, street, house, korp, kvart FROm main WHERE snilsdoc=$1 OR snilsdoc=$2 order by surname;`
+//
+//	rows, err := p.DB.Query(context.Background(), stmt, snilsdoc[0], snilsdoc[1])
+//	if err != nil {
+//		fmt.Println(err)
+//	}
+//	defer rows.Close()
+//	for rows.Next() {
+//		pct := &Pacient{}
+//		err := rows.Scan(&pct.Pid, &pct.Enp, &pct.Surname, &pct.Name, &pct.Patronymic, &pct.Birthday, &pct.Gender, &pct.Snils, &pct.City, &pct.NasPunkt, &pct.Street, &pct.House,
+//			&pct.Korp, &pct.Kvart)
+//		if err != nil {
+//			fmt.Println(err)
+//		}
+//		pcts = append(pcts, pct)
+//	}
+//	if rows.Err() != nil {
+//		return nil, err
+//	}
+//}
+//
+
 func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
 	stmt := `INSERT INTO main 
 		 (pid, enp, surname, name, patronymic, birthday, gender, snils, placebirth, 

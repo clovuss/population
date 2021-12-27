@@ -13,7 +13,7 @@ import (
 type application struct {
 	popXML   map[string]preparedata.PRIKREP
 	Repo     *models.PacientDB
-	snilsdoc map[int][]string
+	snilsdoc map[int]string
 	View     *view.View
 }
 
@@ -23,22 +23,22 @@ func main() {
 	defer dbpool.Close()
 	app := application{
 		Repo: &models.PacientDB{DB: dbpool},
-		snilsdoc: map[int][]string{
-			1:  {"037-431-051 26"},
-			2:  {"173-024-614 35", "171-395-174 75"},
-			3:  {"037-431-166 36"},
-			4:  {"139-926-189 10"},
-			5:  {"121-876-460 62"},
-			6:  {"037-431-155 33"},
-			7:  {"037-431-143 29"},
-			8:  {"037-431-139 33"},
-			9:  {"036-579-107 76"},
-			10: {"037-431-141 27"},
-			11: {"171-395-174 75", "173-024-614 35"},
-			12: {"037-431-161 31"},
+		snilsdoc: map[int]string{
+			1:  "037-431-051 26",
+			2:  "173-024-614 35, 171-395-174 75",
+			3:  "037-431-166 36",
+			4:  "139-926-189 10",
+			5:  "121-876-460 62",
+			6:  "037-431-155 33",
+			7:  "037-431-143 29",
+			8:  "037-431-139 33",
+			9:  "036-579-107 76",
+			10: "037-431-141 27",
+			11: "171-395-174 75, 173-024-614 35",
+			12: "037-431-161 31",
 		},
 	}
-	app.popXML = preparedata.ImprooveDataPrepare("14")
+	//app.popXML = preparedata.ImprooveDataPrepare("14")
 	server := http.Server{
 		Addr:      ":8080",
 		Handler:   app.routes(),

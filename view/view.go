@@ -22,16 +22,16 @@ type View struct {
 	SnilsDoc     string
 }
 
-func Construct(params map[string]string, uch int) *View {
+func Construct(params map[string][]string, uch int) *View {
 	v := &View{
-		NumUch:   uch,
-		Fio:      "on",
-		Birthday: params["checkBirthday"],
-		Enp:      params["checkEnp"],
-		Snils:    params["checkSnils"],
-		Adress:   params["checkAdress"],
-		PrikDate: params["checkPrikrepdate"],
-		PrikAuto: params["checkPrikreptype"],
+		NumUch: uch,
+		Fio:    "on",
+		//Birthday: params["checkBirthday"],
+		//Enp:      params["checkEnp"],
+		//Snils:    params["checkSnils"],
+		//Adress:   params["checkAdress"],
+		//PrikDate: params["checkPrikrepdate"],
+		//PrikAuto: params["checkPrikreptype"],
 	}
 	return v
 }

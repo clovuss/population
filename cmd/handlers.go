@@ -29,13 +29,16 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	paramsUser := make(map[string]string, 0)
-	paramsUser["checkBirthday"] = req.Form.Get("birthday")
-	paramsUser["checkEnp"] = req.Form.Get("enp")
-	paramsUser["checkSnils"] = req.Form.Get("snils")
-	paramsUser["checkAdress"] = req.Form.Get("adress")
-	paramsUser["checkPrikreptype"] = req.Form.Get("prikreptype")
-	paramsUser["checkPrikrepdate"] = req.Form.Get("prikrepdate")
+	paramsUser := make(map[string][]string)
+	paramsUser = req.Form
+
+	//paramsUser =append(paramsUser, req.Form.Get("birthday"))
+	//paramsUser =append(paramsUser, req.Form.Get("enp"))
+	//paramsUser["checkEnp"] = req.Form.Get("enp")
+	//paramsUser["checkSnils"] = req.Form.Get("snils")
+	//paramsUser["checkAdress"] = req.Form.Get("adress")
+	//paramsUser["checkPrikreptype"] = req.Form.Get("prikreptype")
+	//paramsUser["checkPrikrepdate"] = req.Form.Get("prikrepdate")
 	numberUch, err := strconv.Atoi(req.URL.Path[len("/view/"):])
 	if err != nil {
 		fmt.Println(err)
@@ -44,7 +47,16 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		http.NotFound(w, req)
 		return
 	}
+	resultformDB, err := app.Repo.GetByUch(paramsUser, app.snilsdoc[numberUch])
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(*resultformDB[1])
+	if err != nil {
+		fmt.Println(err)
+	}
 	vs := view.Construct(paramsUser, numberUch)
+
 	vs.RenderHTML(w)
 	if err != nil {
 		fmt.Println(err)
