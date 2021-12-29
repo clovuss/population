@@ -3,7 +3,7 @@
 <!-- <summary>Выбор полей</summary> -->
     <form method="get" action="/view/{{.NumUch}}">
     <div>
-        <input type="checkbox"  name="fio"  checked>
+        <input type="checkbox"    checked >
         <label for="scales">ФИО</label>
     </div>
     <div>
@@ -16,11 +16,11 @@
         </div>
         <div>
             <input type="checkbox"  name="adress"  {{ if .Adress}} checked {{end}} >
-            <label for="scales">СНИЛС</label>
+            <label for="scales">Адрес</label>
         </div>
         <div>
             <input type="checkbox"  name="snils" {{ if .Snils}} checked {{end}} >
-            <label for="scales">Адрес</label>
+            <label for="scales">CНИЛС</label>
         </div>
         <div>
             <input type="checkbox"  name="prikreptype" {{ if .PrikAuto}} checked {{end}}>
@@ -30,11 +30,32 @@
             <input type="checkbox"  name="prikrepdate" {{ if .PrikDate}} checked {{end}}>
             <label for="scales">Дата прикрепления</label>
         </div>
-        <input type="reset" value="Поля по умолчанию">
+
         <input type="submit" value="Сформировать">
     </form>
 <!--     </details> -->
-    {{range .Record}}
-        {{.Surname}}  {{.Name}} {{.Patronymic}} {{.Birthday}} <br>
+<table align="center" border="5" width = 100%>
+<tr>
+    {{range .Pacients}}
+    <tr>
+         {{with .Surname}} <td>{{.}}</td> {{end}}
+         {{with .Name}} <td>.</td>{{end}}
+         {{with .Patronymic}} <td>. </td>{{end}}
+         {{with .Gender}} <td> . </td>{{end}}
+         {{with .Enp}} <td> .</td>{{end}}
+         {{with .Birthday}} <td> . </td>{{end}}
+         {{with .Snils}} <td> . </td>{{end}}
+         {{with .PrikAuto}} <td> . </td>{{end}}
+         {{with .PrikDate}} <td> . </td>{{end}}
+         {{with .City}} <td> . </td>{{end}}
+         {{with .NasPunkt}} <td> . </td>{{end}}
+         {{with .Street}} <td> . </td>{{end}}
+         {{with .House}} <td> . </td>{{end}}
+         {{with .Korp}} <td> . </td>{{end}}
+          {{with .Kvart}}<td> . </td>{{end}}
+
+    </tr>
     {{end}}
+
+</table>
 {{end}}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/clovuss/population/preparedata"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"strings"
 )
 
 type PacientDB struct {
@@ -23,71 +24,65 @@ func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
 	return pct, nil
 }
 
-func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc ...interface{}) ([]*Pacient, error) {
+func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*Pacient, error) {
 	pcts := make([]*Pacient, 0)
-	var rawsqlsring string
+	pctemp := &Pacient{}
+	rawsqlparams := make([]string, 0, len(params)+8)
+	rawsqlparams = append(rawsqlparams, "surname", "name", "patronymic", "gender")
+	destField := make([]interface{}, 0, len(params)+8)
+	destField = append(destField, &pctemp.Surname, &pctemp.Name, &pctemp.Patronymic, &pctemp.Gender)
 	for k, _ := range params {
-		rawsqlsring += ", " + k
+		if k != "adress" {
+			rawsqlparams = append(rawsqlparams, k)
+		} else {
+			rawsqlparams = append(rawsqlparams, "city", "naspunkt", "street", "house", "korp", "kvart")
+		}
+		switch k {
+		case "enp":
+			destField = append(destField, &pctemp.Enp)
+		case "birthday":
+			destField = append(destField, &pctemp.Birthday)
+		case "snils":
+			destField = append(destField, &pctemp.Snils)
+		case "prikreptype":
+			destField = append(destField, &pctemp.PrikAuto)
+		case "prikrepdate":
+			destField = append(destField, &pctemp.PrikDate)
+		case "adress":
+			destField = append(destField, &pctemp.City, &pctemp.NasPunkt, &pctemp.Street, &pctemp.House, &pctemp.Korp, &pctemp.Kvart)
+
+		}
 	}
-	fmt.Println(rawsqlsring)
-
-	//var addsql string
-	stmt := `SELECT surname, name, patronymic,
-		birthday, enp, gender, snils, 
-		city, naspunkt, street, house, korp, kvart, 
-		prikrepdate, prikreptype 
-		FROM main WHERE snilsdoc=$1 order by surname ;`
-	//if len(snilsdoc) == 2 {
-	//addsql = `OR snilsdoc=$2`
-	//
-	//}
-	rows, err := p.DB.Query(context.Background(), stmt, snilsdoc...)
-
+	queryString := fmt.Sprintf(`SELECT %v FROM main WHERE `, strings.Join(rawsqlparams, ", "))
+	snilsparams := make([]interface{}, 0, 2)
+	snilsargs := "snilsdoc=$1 OR snilsdoc=$2 order by surname;"
+	snilsparams = append(snilsparams, snilsdoc[0])
+	if len(snilsdoc) == 2 {
+		snilsparams = append(snilsparams, snilsdoc[1])
+	} else {
+		snilsargs = strings.Replace(snilsargs, "OR snilsdoc=$2", "", 1)
+	}
+	queryString += snilsargs
+	rows, err := p.DB.Query(context.Background(), queryString, snilsparams...)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		pct := &Pacient{}
-		err := rows.Scan(&pct.Surname, &pct.Name, &pct.Patronymic,
-			&pct.Birthday, &pct.Enp, &pct.Gender, &pct.Snils,
-			&pct.City, &pct.NasPunkt, &pct.Street, &pct.House, &pct.Korp, &pct.Kvart,
-			&pct.PrikDate, &pct.PrikAuto)
+		err := rows.Scan(destField...)
 		if err != nil {
 			fmt.Println(err)
 		}
+		pct := &Pacient{}
+		*pct = *pctemp
 		pcts = append(pcts, pct)
 	}
 	if rows.Err() != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return pcts, nil
 }
-
-//else {
-//
-//	stmt := `SELECT pid, enp, surname, name, patronymic, birthday,
-//   gender, snils, city, naspunkt, street, house, korp, kvart FROm main WHERE snilsdoc=$1 OR snilsdoc=$2 order by surname;`
-//
-//	rows, err := p.DB.Query(context.Background(), stmt, snilsdoc[0], snilsdoc[1])
-//	if err != nil {
-//		fmt.Println(err)
-//	}
-//	defer rows.Close()
-//	for rows.Next() {
-//		pct := &Pacient{}
-//		err := rows.Scan(&pct.Pid, &pct.Enp, &pct.Surname, &pct.Name, &pct.Patronymic, &pct.Birthday, &pct.Gender, &pct.Snils, &pct.City, &pct.NasPunkt, &pct.Street, &pct.House,
-//			&pct.Korp, &pct.Kvart)
-//		if err != nil {
-//			fmt.Println(err)
-//		}
-//		pcts = append(pcts, pct)
-//	}
-//	if rows.Err() != nil {
-//		return nil, err
-//	}
-//}
-//
 
 func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
 	stmt := `INSERT INTO main 
