@@ -9,16 +9,32 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, req *http.Request) {
-	tem, err := template.ParseFiles("./ui/html/base.html")
-	if err != nil {
-		fmt.Println(err)
-	}
-	r, err := app.Repo.GetByPid("65")
-	if err != nil {
-		fmt.Println(err)
-	}
+	//tem, err := template.ParseFiles("./ui/html/base.html")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//r, err := app.Repo.GetByPid("65")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//
+	//err = tem.Execute(w, r)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	tem, err := template.ParseFiles("./ui/html/ex.html")
 
-	err = tem.Execute(w, r)
+	if err != nil {
+		fmt.Println(err)
+	}
+	sl := make(map[int][]string, 5)
+	sl[1] = []string{"раз1", "раз2", "раз3", "раз4"}
+	sl[2] = []string{"два1", "два2"}
+	sl[3] = []string{}
+	sl[4] = []string{"четыре"}
+	sl[5] = []string{"пять", "пять", "пять", "пять", "пять"}
+
+	err = tem.Execute(w, sl)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -30,8 +46,8 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		fmt.Println(err)
 	}
 	paramsUser := make(map[string][]string)
-	paramsUser = req.Form
-	//fmt.Println(paramsUser)
+	paramsUser["uch_zav"] = []string{"on"}
+
 	numberUch, err := strconv.Atoi(req.URL.Path[len("/view/"):])
 	if err != nil {
 		fmt.Println(err)
@@ -47,16 +63,17 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("mis", err)
 	}
 
-	fmt.Println("exit:", *(pac[2]))
+	//fmt.Println("exit:", *(pac[2]))
 
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	vs := view.Construct(paramsUser, numberUch, pac)
 
 	vs.RenderHTML(w)
 	if err != nil {
-		fmt.Println("FLJHL", err)
+		fmt.Println(err)
 	}
 
 }

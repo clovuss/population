@@ -25,12 +25,14 @@ func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
 }
 
 func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*Pacient, error) {
-	pcts := make([]*Pacient, 0)
+	//pcts := make([]*Pacient, 0)
 	pctemp := &Pacient{}
 	rawsqlparams := make([]string, 0, len(params)+8)
 	rawsqlparams = append(rawsqlparams, "surname", "name", "patronymic", "gender")
 	destField := make([]interface{}, 0, len(params)+8)
 	destField = append(destField, &pctemp.Surname, &pctemp.Name, &pctemp.Patronymic, &pctemp.Gender)
+	tableparams := " FROM main"
+
 	for k, _ := range params {
 		if k != "adress" {
 			rawsqlparams = append(rawsqlparams, k)
@@ -50,12 +52,17 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 			destField = append(destField, &pctemp.PrikDate)
 		case "adress":
 			destField = append(destField, &pctemp.City, &pctemp.NasPunkt, &pctemp.Street, &pctemp.House, &pctemp.Korp, &pctemp.Kvart)
-
+		case "uch_zav":
+			destField = append(destField, &pctemp.UchZav)
+			tableparams += ", uch7"
 		}
 	}
-	queryString := fmt.Sprintf(`SELECT %v FROM main WHERE `, strings.Join(rawsqlparams, ", "))
+	fmt.Println(rawsqlparams)
+	fmt.Println(tableparams)
+	queryString := fmt.Sprintf(`SELECT %v`, strings.Join(rawsqlparams, ", "))
+	queryString += tableparams
 	snilsparams := make([]interface{}, 0, 2)
-	snilsargs := "snilsdoc=$1 OR snilsdoc=$2 order by surname;"
+	snilsargs := " WHERE snilsdoc=$1 OR snilsdoc=$2 order by surname;"
 	snilsparams = append(snilsparams, snilsdoc[0])
 	if len(snilsdoc) == 2 {
 		snilsparams = append(snilsparams, snilsdoc[1])
@@ -63,25 +70,27 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 		snilsargs = strings.Replace(snilsargs, "OR snilsdoc=$2", "", 1)
 	}
 	queryString += snilsargs
-	rows, err := p.DB.Query(context.Background(), queryString, snilsparams...)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		err := rows.Scan(destField...)
-		if err != nil {
-			fmt.Println(err)
-		}
-		pct := &Pacient{}
-		*pct = *pctemp
-		pcts = append(pcts, pct)
-	}
-	if rows.Err() != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	return pcts, nil
+	fmt.Println(74, queryString)
+	//rows, err := p.DB.Query(context.Background(), queryString, snilsparams...)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//defer rows.Close()
+	//for rows.Next() {
+	//	err := rows.Scan(destField...)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//	pct := &Pacient{}
+	//	*pct = *pctemp
+	//	pcts = append(pcts, pct)
+	//
+	//}
+	//if rows.Err() != nil {
+	//	fmt.Println(err)
+	//	return nil, err
+	//}
+	return nil, nil
 }
 
 func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
@@ -99,6 +108,33 @@ func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
 	return nil
 
 }
+func (p *PacientDB) InsertUch(csvslice []string) error {
+	stmt := `INSERT INTO uch7
+		 (enp, num_amb_card, uch_zav) 
+		VALUES($1, $2, $3);`
+
+	_, err := p.DB.Exec(context.Background(), stmt, csvslice[0], csvslice[1], csvslice[2])
+
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+func (p *PacientDB) InsertPromed(csvslice []string) error {
+	stmt := `INSERT INTO promed
+		 (card, surname, name, patronymic, birthday, address, live_address, enp) 
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8);`
+
+	_, err := p.DB.Exec(context.Background(), stmt, csvslice[0], csvslice[1], csvslice[2], csvslice[3], csvslice[4], csvslice[5], csvslice[6], csvslice[7])
+
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
 func (p *PacientDB) InnsertOne(prikrep interface{}) error {
 	stmt := "INSERT INTO main (pid) VALUES($1);"
 	_, err := p.DB.Exec(context.Background(), stmt, prikrep)

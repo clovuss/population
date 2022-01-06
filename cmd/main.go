@@ -39,6 +39,7 @@ func main() {
 		},
 	}
 	//app.popXML = preparedata.ImprooveDataPrepare("14")
+
 	server := http.Server{
 		Addr:      ":8080",
 		Handler:   app.routes(),
@@ -46,15 +47,6 @@ func main() {
 		ErrorLog:  nil,
 	}
 
-	//map15 := improoveDataPrepare("15")
-	//
-	//for k, _ := range map15 {
-	//
-	//	_, ok := map14[k]
-	//	if !ok {
-	//		fmt.Println(k)
-	//	}
-	//}
 	err := server.ListenAndServe()
 	if err != nil {
 		fmt.Println(err)

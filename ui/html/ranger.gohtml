@@ -1,0 +1,83 @@
+{{define "ranger"}}
+<!-- <details> -->
+<!-- <summary>Выбор полей</summary> -->
+    {{$localview := .}}
+    <form method="get" action="/view/{{.NumUch}}">
+    <div>
+        <input type="checkbox"    checked >
+        <label for="scales">ФИО</label>
+    </div>
+        <div>
+            <input type="checkbox"    checked >
+            <label for="scales">Пол</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="enp" {{ if .Enp}} checked {{end}}>
+            <label for="scales">ЕНП</label>
+        </div>
+        <div>
+        <input type="checkbox"  name="birthday" {{ if .Birthday}} checked {{end}} >
+        <label for="scales">Дата рождения</label>
+    </div>
+
+
+        <div>
+            <input type="checkbox"  name="snils" {{ if .Snils}} checked {{end}} >
+            <label for="scales">CНИЛС</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="prikreptype" {{ if .PrikAuto}} checked {{end}}>
+            <label for="scales">Тип прикрепления </label>
+        </div>
+        <div>
+            <input type="checkbox"  name="prikrepdate" {{ if .PrikDate}} checked {{end}}>
+            <label for="scales">Дата прикрепления</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="uch_zav" {{ if .UchZav}} checked {{end}}>
+            <label for="scales">Уч. заведение</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="adress"  {{ if .Adress}} checked {{end}} >
+            <label for="scales">Адрес</label>
+        </div>
+
+        <input type="submit" value="Сформировать">
+    </form>
+<!--     </details> -->
+<table align="center" border="5" width = 100%>
+<tr>
+   {{if .Fio}} <td>Фамилия</td> {{end}}
+   {{if .Fio}} <td>Имя</td> {{end}}
+   {{if .Fio}} <td>Отчество</td> {{end}}
+   {{if .Gender}} <td>Пол</td> {{end}}
+   {{if  .Enp}}<td>Номер полиса</td> {{end}} {{$enp := .Enp}}
+   {{if .Birthday}} <td>Дата рождения</td> {{end}} {{$bday := .Birthday}}
+   {{if .Snils}}<td>СНИЛС</td> {{end}} {{$snils := .Snils}}
+   {{if .PrikAuto}}<td>Прикреп</td> {{end}} {{$prikA := .PrikAuto}}
+   {{if .PrikDate}}<td>Дата прик</td> {{end}} {{$prikD := .PrikDate}}
+    {{if .Adress}}<td>Город</td><td>НП</td><td>улица</td><td>дом</td><td>корпус</td><td>кв</td> {{end}} {{$adress := .Adress}}
+    </tr>
+    {{range .Pacients}}
+    <tr>
+         <td>{{.Surname}}</td>
+         <td>{{.Name}}</td>
+         <td>{{.Patronymic}} </td>
+         <td> {{ $localview.GenderView .Gender}} </td>
+         {{if $enp}} <td> {{.Enp}}</td>{{end}}
+         {{if $bday}} <td> {{ $localview.DateFormat .Birthday}} </td>{{end}}
+         {{if $snils}}<td> {{.Snils}} </td>{{end}}
+         {{if $prikA}}<td> {{ $localview.PrikrepView .PrikAuto}} </td>{{end}}
+         {{if $prikD}}<td> {{$localview.DateFormat .PrikDate}} </td>{{end}}
+         {{if $adress}}<td> {{.City}} </td>{{end}}
+         {{if $adress}}<td> {{.NasPunkt}} </td>{{end}}
+         {{if $adress}}<td> {{.Street}} </td>{{end}}
+         {{if $adress}}<td> {{.House}} </td>{{end}}
+         {{if $adress}}<td> {{.Korp}} </td>{{end}}
+         {{if $adress}}<td> {{.Kvart}} </td>{{end}}
+
+    </tr>
+    {{end}}
+
+</table>
+{{end}}
