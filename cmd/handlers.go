@@ -3,50 +3,36 @@ package main
 import (
 	"fmt"
 	"github.com/clovuss/population/view"
-	"html/template"
 	"net/http"
 	"strconv"
 )
 
+//home returns  start page
 func (app *application) home(w http.ResponseWriter, req *http.Request) {
-	//tem, err := template.ParseFiles("./ui/html/base.html")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//r, err := app.Repo.GetByPid("65")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//
-	//err = tem.Execute(w, r)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	tem, err := template.ParseFiles("./ui/html/ex.html")
-
-	if err != nil {
-		fmt.Println(err)
-	}
-	sl := make(map[int][]string, 5)
-	sl[1] = []string{"раз1", "раз2", "раз3", "раз4"}
-	sl[2] = []string{"два1", "два2"}
-	sl[3] = []string{}
-	sl[4] = []string{"четыре"}
-	sl[5] = []string{"пять", "пять", "пять", "пять", "пять"}
-
-	err = tem.Execute(w, sl)
+	//tem, err := template.ParseFiles(
+	//	"./ui/html/base.gohtml",
+	//	"./ui/html/ranger.gohtml")
+	_, err := w.Write([]byte("hello"))
 	if err != nil {
 		fmt.Println(err)
 	}
 
+	//err = tem.Execute(w, "Hello from home")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
 }
+
 func (app *application) view(w http.ResponseWriter, req *http.Request) {
+	//get view options from user
 	err := req.ParseForm()
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	paramsUser := make(map[string][]string)
-	paramsUser["uch_zav"] = []string{"on"}
+	paramsUser = req.Form
+	fmt.Println(paramsUser)
 
 	numberUch, err := strconv.Atoi(req.URL.Path[len("/view/"):])
 	if err != nil {
@@ -56,8 +42,8 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		http.NotFound(w, req)
 		return
 	}
-	//fmt.Println("numberuch: ", app.snilsdoc[numberUch][1])
-	pac, err := app.Repo.GetByUch(paramsUser, app.snilsdoc[numberUch])
+	fmt.Println("numberUch:", numberUch)
+	//pac, err := app.Repo.GetByUch(paramsUser, app.snilsdoc[numberUch])
 
 	if err != nil {
 		fmt.Println("mis", err)
@@ -69,7 +55,8 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		fmt.Println(err)
 	}
 
-	vs := view.Construct(paramsUser, numberUch, pac)
+	vs := view.Construct(paramsUser, numberUch, nil)
+	fmt.Println(vs.NumUch)
 
 	vs.RenderHTML(w)
 	if err != nil {

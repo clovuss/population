@@ -22,12 +22,13 @@ type ZGLV struct {
 }
 
 type PRIKREP struct {
-	Pid          string `xml:"pid"`
-	ENP          string `xml:"ENP"`
-	FAM          string `xml:"FAM"`
-	IM           string `xml:"IM"`
-	OT           string `xml:"OT"`
-	BIRTHDAY     string `xml:"DR"`
+	Pid      string `xml:"pid"`
+	ENP      string `xml:"ENP"`
+	FAM      string `xml:"FAM"`
+	IM       string `xml:"IM"`
+	OT       string `xml:"OT"`
+	BIRTHDAY string `xml:"DR"`
+	//Bday string `xml:"DR"`
 	GENDER       string `xml:"W"`
 	SNILS        string `xml:"SS"`
 	PLACEOFBIRTH string `xml:"MR"`
@@ -84,6 +85,7 @@ func dataprepare() *[]PRIKREP {
 
 	return &all.Prikrep
 }
+
 func ImprooveDataPrepare(f string) map[string]PRIKREP {
 	fp := "./data/PRIKREP_M300025_2112" + f + ".xml"
 	xmlfile, err := os.Open(fp)
@@ -126,6 +128,66 @@ func ImprooveDataPrepare(f string) map[string]PRIKREP {
 			if typ.Name.Local == "PRIKREP" {
 				xmlDecoder.DecodeElement(&pacient, &typ)
 				pacients[pacient.Pid] = pacient
+				co++
+			}
+
+		}
+
+	}
+
+	return pacients
+}
+
+//ImprooveDataPrepareU generates map os string with date format as dd.mm.yyyy
+
+func ImprooveDataPrepareU(day string) map[string]PRIKREP {
+	fp := "./data/PRIKREP_M300025_2201" + day + ".xml"
+	xmlfile, err := os.Open(fp)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	defer xmlfile.Close()
+	xmlDecoder := xml.NewDecoder(xmlfile)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	xmlDecoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+		switch charset {
+		case "windows-1251":
+			return charmap.Windows1251.NewDecoder().Reader(input), nil
+		default:
+			return nil, fmt.Errorf("unknown charset: %s", charset)
+		}
+	}
+	co := 0
+	pacients := make(map[string]PRIKREP)
+	for {
+		token, err := xmlDecoder.Token()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			panic(err)
+		}
+		if token == nil {
+			break
+		}
+
+		switch typ := token.(type) { //StartElement, EndElement, CharData, Comment, ProcInst, or Directive
+		case xml.StartElement:
+			var pacient PRIKREP
+			if typ.Name.Local == "PRIKREP" {
+				xmlDecoder.DecodeElement(&pacient, &typ)
+				point := []byte(".")
+				temps := []byte(pacient.BIRTHDAY)
+				newslice := []byte{temps[8], temps[9], point[0], temps[5], temps[6], point[0],
+					temps[0], temps[1], temps[2], temps[3],
+				}
+
+				pacient.BIRTHDAY = string((newslice))
+				pacients[pacient.FAM+pacient.IM+pacient.OT+pacient.BIRTHDAY] = pacient
 				co++
 			}
 

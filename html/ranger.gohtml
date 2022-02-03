@@ -1,0 +1,116 @@
+{{define "ranger"}}
+<!-- <details> -->
+<!-- <summary>Выбор полей</summary> -->
+    {{$localview := .}}
+    <form method="get" action="/view/{{.NumUch}}">
+    <div>
+        <input type="checkbox" id="fio" checked>
+        <label for="fio">ФИО</label>
+    </div>
+    <div>
+        <input type="checkbox" id="gender" checked >
+        <label for="gender">Пол</label>
+    </div>
+    <div>
+        <input type="checkbox" id="enp" name = "enp"  {{ if .Enp}} checked {{end}}>
+        <label for="enp">ЕНП</label>
+    </div>
+    <div>
+        <input type="checkbox"  name="birthday" id="birthday"{{ if .Birthday}} checked {{end}} >
+        <label for="birthday">Дата рождения</label>
+    </div>
+        <div>
+            <input type="checkbox"  name="snils" id="snils"{{ if .Snils}} checked {{end}} >
+            <label for="snils">CНИЛС</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="prikreptype" id="prikreptype" {{ if .PrikAuto}} checked {{end}}>
+            <label for="prikreptype">Тип прикрепления </label>
+        </div>
+        <div>
+            <input type="checkbox"  name="prikrepdate" id="prikrepdate" {{ if .PrikDate}} checked {{end}}>
+            <label for="prikrepdate">Дата прикрепления</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="uch_zav" id="uch_zav"{{ if .UchZav}} checked {{end}}>
+            <label for="uch_zav">Уч. зав</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="adress" id="adress" {{ if .Adress}} checked {{end}} >
+            <label for="adress">Регистрация</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="live_adress" id="live_adress" {{ if .LiveAdress}} checked {{end}} >
+            <label for="live_adress">Место жительства</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="document" id="document" {{ if .Document}} checked {{end}} >
+            <label for="document">Документ личность</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="phone" id="phone" {{ if .Phone}} checked {{end}} >
+            <label for="phone">Номер телефона</label>
+        </div>
+        <div>
+            <input type="checkbox"  name="card_num" id="card_num" {{ if .CardNum}} checked {{end}} >
+            <label for="card_num">Номер карты</label>
+        </div>
+
+
+
+
+        <input type="submit" value="Сформировать">
+    </form>
+<!--     </details> -->
+<table class="main_table">
+    <thead>
+<tr>
+   {{if .Fio}} <td>Фамилия</td> {{end}}
+   {{if .Fio}} <td>Имя</td> {{end}}
+   {{if .Fio}} <td>Отчество</td> {{end}}
+   {{if .Gender}} <td>Пол</td> {{end}}
+   {{if .Enp}}<td>ЕНП</td> {{end}} {{$enp := .Enp}}
+   {{if .Birthday}} <td>Дата рождения</td> {{end}} {{$bday := .Birthday}}
+   {{if .Snils}}<td>СНИЛС</td> {{end}} {{$snils := .Snils}}
+   {{if .PrikAuto}}<td>ТипПрикреп</td> {{end}} {{$prikA := .PrikAuto}}
+   {{if .PrikDate}}<td>ДатаПрикреп</td> {{end}} {{$prikD := .PrikDate}}
+   {{if .UchZav}}<td>УчебЗав</td> {{end}} {{$uchZav := .UchZav}}
+   {{if .Document}}<td>Документ1</td><td>Документ2</td><td>Документ3</td> {{end}} {{$doc := .Document}}
+   {{if .Adress}}<td>Город</td><td>НасПункт</td><td>Улица</td><td>Дом</td><td>Корпус</td><td>кв</td> {{end}} {{$adress := .Adress}}
+ {{if .LiveAdress}}<td>Место жительства</td>{{end}} {{$liveAdress := .LiveAdress}}
+    {{if .Phone}}<td>Телефон</td>{{end}} {{$phone := .Phone}}
+    {{if .CardNum}}<td>Карта</td>{{end}} {{$cardNum := .CardNum}}
+</tr>
+    </thead>
+    {{range .Pacients}}
+    <tr>
+         <td>{{.Surname}}</td>
+         <td>{{.Name}}</td>
+         <td>{{.Patronymic}} </td>
+         <td> {{ $localview.GenderView .Gender}} </td>
+         {{if $enp}} <td> {{.Enp}}</td>{{end}}
+         {{if $bday}} <td> {{ $localview.DateFormat .Birthday}} </td>{{end}}
+         {{if $snils}}<td> {{.Snils}} </td>{{end}}
+         {{if $prikA}}<td> {{ $localview.PrikrepView .PrikAuto}} </td>{{end}}
+         {{if $prikD}}<td> {{$localview.DateFormat .PrikDate}} </td>{{end}}
+        {{if $uchZav}}<td> учеб зав </td>{{end}}
+        {{ if  $doc}} <td> док1 </td>{{end}}
+        {{ if  $doc}} <td> док2 </td>{{end}}
+        {{ if  $doc}} <td> док3 </td>{{end}}
+         {{if $adress}}<td> {{.City}} </td>{{end}}
+         {{if $adress}}<td> {{.NasPunkt}} </td>{{end}}
+         {{if $adress}}<td> {{.Street}} </td>{{end}}
+         {{if $adress}}<td> {{.House}} </td>{{end}}
+         {{if $adress}}<td> {{.Korp}} </td>{{end}}
+         {{if $adress}}<td> {{.Kvart}} </td>{{end}}
+        {{if $liveAdress}}<td> Место жительства </td>{{end}}
+        {{if $phone}}<td> телефон </td>{{end}}
+        {{if $cardNum}}<td> карта </td>{{end}}
+
+
+
+    </tr>
+    {{end}}
+
+</table>
+{{end}}

@@ -25,7 +25,7 @@ func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
 }
 
 func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*Pacient, error) {
-	//pcts := make([]*Pacient, 0)
+	pcts := make([]*Pacient, 0)
 	pctemp := &Pacient{}
 	rawsqlparams := make([]string, 0, len(params)+8)
 	rawsqlparams = append(rawsqlparams, "surname", "name", "patronymic", "gender")
@@ -57,8 +57,8 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 			tableparams += ", uch7"
 		}
 	}
-	fmt.Println(rawsqlparams)
-	fmt.Println(tableparams)
+	//fmt.Println(rawsqlparams)
+	//fmt.Println(tableparams)
 	queryString := fmt.Sprintf(`SELECT %v`, strings.Join(rawsqlparams, ", "))
 	queryString += tableparams
 	snilsparams := make([]interface{}, 0, 2)
@@ -70,26 +70,26 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 		snilsargs = strings.Replace(snilsargs, "OR snilsdoc=$2", "", 1)
 	}
 	queryString += snilsargs
-	fmt.Println(74, queryString)
-	//rows, err := p.DB.Query(context.Background(), queryString, snilsparams...)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//defer rows.Close()
-	//for rows.Next() {
-	//	err := rows.Scan(destField...)
-	//	if err != nil {
-	//		fmt.Println(err)
-	//	}
-	//	pct := &Pacient{}
-	//	*pct = *pctemp
-	//	pcts = append(pcts, pct)
-	//
-	//}
-	//if rows.Err() != nil {
-	//	fmt.Println(err)
-	//	return nil, err
-	//}
+	//fmt.Println(74, queryString)
+	rows, err := p.DB.Query(context.Background(), queryString, snilsparams...)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(destField...)
+		if err != nil {
+			fmt.Println(err)
+		}
+		pct := &Pacient{}
+		*pct = *pctemp
+		pcts = append(pcts, pct)
+
+	}
+	if rows.Err() != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 	return nil, nil
 }
 
@@ -109,11 +109,11 @@ func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
 
 }
 func (p *PacientDB) InsertUch(csvslice []string) error {
-	stmt := `INSERT INTO uch7
-		 (enp, num_amb_card, uch_zav) 
-		VALUES($1, $2, $3);`
+	stmt := `INSERT INTO uch1
+		 (surname, name, patronymic, bday,  enp, uch_zav, tel1, tel2) 
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8);`
 
-	_, err := p.DB.Exec(context.Background(), stmt, csvslice[0], csvslice[1], csvslice[2])
+	_, err := p.DB.Exec(context.Background(), stmt, csvslice[0], csvslice[1], csvslice[2], csvslice[3], csvslice[4], csvslice[5], csvslice[6], csvslice[7])
 
 	if err != nil {
 		return err
@@ -134,7 +134,6 @@ func (p *PacientDB) InsertPromed(csvslice []string) error {
 	return nil
 
 }
-
 func (p *PacientDB) InnsertOne(prikrep interface{}) error {
 	stmt := "INSERT INTO main (pid) VALUES($1);"
 	_, err := p.DB.Exec(context.Background(), stmt, prikrep)

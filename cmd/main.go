@@ -38,8 +38,21 @@ func main() {
 			12: {"037-431-161 31"},
 		},
 	}
-	//app.popXML = preparedata.ImprooveDataPrepare("14")
 
+	//mapafromXML := preparedata.ImprooveDataPrepareU("13")
+
+	//mapafromuch := preparedata.Prepare1csv("1")
+	//for _, v := range mapafromuch {
+	//	err := app.Repo.InsertUch(v)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//		break
+	//	}
+	//}
+
+	//fmt.Println("длина в м", len(mapafromuch))
+
+	//os.Exit(0)
 	server := http.Server{
 		Addr:      ":8080",
 		Handler:   app.routes(),

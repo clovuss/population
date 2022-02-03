@@ -3,10 +3,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{.Fio}}</title>
+ <link rel='stylesheet' href='/static/css/style.css'>
+  <title>Старт</title>
 </head>
 <body>
- выбери участок
+ Выберите участок
  <a href="/view/1">1</a>
  <a href="/view/2">2</a>
  <a href="/view/3">3</a>
@@ -21,7 +22,7 @@
  <a href="/view/12">12</a>
 <br>
 
-{{template "ranger" }}
+{{template "ranger" .}}
 
 
 </body>
