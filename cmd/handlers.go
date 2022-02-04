@@ -32,7 +32,7 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 
 	paramsUser := make(map[string][]string)
 	paramsUser = req.Form
-	fmt.Println(paramsUser)
+	//fmt.Println(paramsUser)
 
 	numberUch, err := strconv.Atoi(req.URL.Path[len("/view/"):])
 	if err != nil {
@@ -42,21 +42,19 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		http.NotFound(w, req)
 		return
 	}
-	fmt.Println("numberUch:", numberUch)
-	//pac, err := app.Repo.GetByUch(paramsUser, app.snilsdoc[numberUch])
+
+	resDb, err := app.Repo.GetByUch(paramsUser, app.snilsdoc[numberUch])
+	fmt.Println(resDb[0])
 
 	if err != nil {
-		fmt.Println("mis", err)
+		fmt.Println("mistake from handler", err)
 	}
-
-	//fmt.Println("exit:", *(pac[2]))
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	vs := view.Construct(paramsUser, numberUch, nil)
-	fmt.Println(vs.NumUch)
 
 	vs.RenderHTML(w)
 	if err != nil {

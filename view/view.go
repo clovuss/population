@@ -5,7 +5,6 @@ import (
 	"github.com/clovuss/population/models"
 	"html/template"
 	"net/http"
-	"reflect"
 	"time"
 )
 
@@ -29,32 +28,32 @@ type View struct {
 	CardNum      bool
 	Phone        bool
 	Pacients     []*models.Pacient
-	PacientsView [][]interface{}
+	//PacientsView [][]interface{}
 }
 
 func Construct(params map[string][]string, uch int, pac []*models.Pacient) *View {
 	//if len(pac) == 0 {
 	//	return nil
 	//}
-	pacsview := make([][]interface{}, 0)
-	for _, v := range pac {
-		vl := reflect.ValueOf(*v)
-		if vl.Kind() != reflect.Struct {
-			return nil
-		}
-		out := make([]interface{}, vl.NumField())
-		for i := 0; i < vl.NumField(); i++ {
-			out[i] = vl.Field(i).Interface()
-		}
-		pacsview = append(pacsview, out)
-	}
+	//pacsview := make([][]interface{}, 0)
+	//for _, v := range pac {
+	//	vl := reflect.ValueOf(*v)
+	//	if vl.Kind() != reflect.Struct {
+	//		return nil
+	//	}
+	//	out := make([]interface{}, vl.NumField())
+	//	for i := 0; i < vl.NumField(); i++ {
+	//		out[i] = vl.Field(i).Interface()
+	//	}
+	//	pacsview = append(pacsview, out)
+	//}
 
 	v := &View{
-		NumUch:       uch,
-		Fio:          "on",
-		Gender:       true,
-		Pacients:     pac,
-		PacientsView: pacsview,
+		NumUch:   uch,
+		Fio:      "on",
+		Gender:   true,
+		Pacients: pac,
+		//PacientsView: pacsview,
 	}
 	for k, _ := range params {
 		switch k {
@@ -80,10 +79,8 @@ func Construct(params map[string][]string, uch int, pac []*models.Pacient) *View
 			v.CardNum = true
 		case "uch_zav":
 			v.UchZav = true
-
 		}
 	}
-
 	return v
 }
 

@@ -22,41 +22,42 @@ type ZGLV struct {
 }
 
 type PRIKREP struct {
-	Pid      string `xml:"pid"`
-	ENP      string `xml:"ENP"`
-	FAM      string `xml:"FAM"`
-	IM       string `xml:"IM"`
-	OT       string `xml:"OT"`
-	BIRTHDAY string `xml:"DR"`
-	//Bday string `xml:"DR"`
+	Pid          string `xml:"pid"`
+	ENP          string `xml:"ENP"`
+	FAM          string `xml:"FAM"`
+	IM           string `xml:"IM"`
+	OT           string `xml:"OT"`
+	BIRTHDAY     string `xml:"DR"`
 	GENDER       string `xml:"W"`
 	SNILS        string `xml:"SS"`
 	PLACEOFBIRTH string `xml:"MR"`
-	DOCTP        string `xml:"DOCTP"`
-	DOCS         string `xml:"DOCS"`
-	DOCN         string `xml:"DOCN"`
-	DOCDT        string `xml:"DOCDT"`
-	DOCORG       string `xml:"DOCORG"`
-	OPDOC        string `xml:"OPDOC"`
-	SPOL         string `xml:"SPOL"`
-	NPOL         string `xml:"NPOL"`
-	CN           string `xml:"CN"`
-	SUBJ         string `xml:"SUBJ"`
-	RN           string `xml:"RN"`
-	INDX         string `xml:"INDX"`
-	RNNAME       string `xml:"RNNAME"`
-	CITY         string `xml:"CITY"`
-	NP           string `xml:"NP"`
-	UL           string `xml:"UL"`
-	DOM          string `xml:"DOM"`
-	KOR          string `xml:"KOR"`
-	KV           string `xml:"KV"`
-	LPU          string `xml:"LPU"`
-	LPUAUTO      string `xml:"LPUAUTO"`
-	LPUDT        string `xml:"LPUDT"`
-	LPUUCH       string `xml:"LPUUCH"`
-	KODPODR      string `xml:"KODPODR"`
-	SSD          string `xml:"SSD"`
+
+	DOCTP  string `xml:"DOCTP"`
+	DOCS   string `xml:"DOCS"`
+	DOCN   string `xml:"DOCN"`
+	DOCDT  string `xml:"DOCDT"`
+	DOCORG string `xml:"DOCORG"`
+
+	OPDOC   string `xml:"OPDOC"`
+	SPOL    string `xml:"SPOL"`
+	NPOL    string `xml:"NPOL"`
+	CN      string `xml:"CN"`
+	SUBJ    string `xml:"SUBJ"`
+	RN      string `xml:"RN"`
+	INDX    string `xml:"INDX"`
+	RNNAME  string `xml:"RNNAME"`
+	CITY    string `xml:"CITY"`
+	NP      string `xml:"NP"`
+	UL      string `xml:"UL"`
+	DOM     string `xml:"DOM"`
+	KOR     string `xml:"KOR"`
+	KV      string `xml:"KV"`
+	LPU     string `xml:"LPU"`
+	LPUAUTO string `xml:"LPUAUTO"`
+	LPUDT   string `xml:"LPUDT"`
+	LPUUCH  string `xml:"LPUUCH"`
+	KODPODR string `xml:"KODPODR"`
+	SSD     string `xml:"SSD"`
 }
 
 func dataprepare() *[]PRIKREP {

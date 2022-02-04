@@ -27,51 +27,67 @@ func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
 func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*Pacient, error) {
 	pcts := make([]*Pacient, 0)
 	pctemp := &Pacient{}
-	rawsqlparams := make([]string, 0, len(params)+8)
-	rawsqlparams = append(rawsqlparams, "surname", "name", "patronymic", "gender")
+	rawsqlFields := make([]string, 0, len(params)+8)
+	rawsqlFields = append(rawsqlFields, "main.surname", "main.name", "main.patronymic", "main.gender") //Поля в БД
 	destField := make([]interface{}, 0, len(params)+8)
 	destField = append(destField, &pctemp.Surname, &pctemp.Name, &pctemp.Patronymic, &pctemp.Gender)
-	tableparams := " FROM main"
-
-	for k, _ := range params {
-		if k != "adress" {
-			rawsqlparams = append(rawsqlparams, k)
-		} else {
-			rawsqlparams = append(rawsqlparams, "city", "naspunkt", "street", "house", "korp", "kvart")
+	tables := " FROM main"
+	fmt.Println(params)
+	//пересмотреть логику добавления джоина, он видимо вставляется много раз
+	for key, _ := range params {
+		if key == "uch_zav" || key == "phone" || key == "card_num" || key == "live_adress" {
+			tables += " JOIN promed ON main.surname=promed.surname AND main.name=promed.name AND main.patronymic=promed.patronymic AND main.birthday=promed.birthday"
 		}
+	}
+	for k, _ := range params {
 		switch k {
 		case "enp":
 			destField = append(destField, &pctemp.Enp)
+			rawsqlFields = append(rawsqlFields, "main."+k)
 		case "birthday":
 			destField = append(destField, &pctemp.Birthday)
+			rawsqlFields = append(rawsqlFields, "main."+k)
 		case "snils":
 			destField = append(destField, &pctemp.Snils)
+			rawsqlFields = append(rawsqlFields, "main."+k)
 		case "prikreptype":
 			destField = append(destField, &pctemp.PrikAuto)
+			rawsqlFields = append(rawsqlFields, "main."+k)
 		case "prikrepdate":
 			destField = append(destField, &pctemp.PrikDate)
+			rawsqlFields = append(rawsqlFields, "main."+k)
 		case "adress":
 			destField = append(destField, &pctemp.City, &pctemp.NasPunkt, &pctemp.Street, &pctemp.House, &pctemp.Korp, &pctemp.Kvart)
+			rawsqlFields = append(rawsqlFields, "main.city", "main.naspunkt", "main.street", "main.house", "main.korp", "main.kvart")
 		case "uch_zav":
+			rawsqlFields = append(rawsqlFields, "promed."+k)
 			destField = append(destField, &pctemp.UchZav)
-			tableparams += ", uch7"
+		case "phone":
+			rawsqlFields = append(rawsqlFields, "promed."+k)
+			destField = append(destField, &pctemp.Phone)
+		case "live_adress":
+			rawsqlFields = append(rawsqlFields, "promed."+k)
+			destField = append(destField, &pctemp.LiveAdress)
+		case "card_num":
+			rawsqlFields = append(rawsqlFields, "promed."+k)
+			destField = append(destField, &pctemp.CardNum)
+		case "document":
+			destField = append(destField, &pctemp.DocType, &pctemp.DocSeries, &pctemp.DocNumber, &pctemp.DocDate, &pctemp.Docorg)
+			rawsqlFields = append(rawsqlFields, "main.doctype", "main.docseries", "main.docnumber", "main.docdate", "main.docorg")
 		}
 	}
-	//fmt.Println(rawsqlparams)
-	//fmt.Println(tableparams)
-	queryString := fmt.Sprintf(`SELECT %v`, strings.Join(rawsqlparams, ", "))
-	queryString += tableparams
+	queryFomSelectToFrom := fmt.Sprintf(`SELECT %v`, strings.Join(rawsqlFields, ", "))
+	whereCondition := " WHERE main.snilsdoc=$1"
 	snilsparams := make([]interface{}, 0, 2)
-	snilsargs := " WHERE snilsdoc=$1 OR snilsdoc=$2 order by surname;"
 	snilsparams = append(snilsparams, snilsdoc[0])
 	if len(snilsdoc) == 2 {
 		snilsparams = append(snilsparams, snilsdoc[1])
-	} else {
-		snilsargs = strings.Replace(snilsargs, "OR snilsdoc=$2", "", 1)
+		whereCondition += " OR main.snilsdoc=$2"
 	}
-	queryString += snilsargs
-	//fmt.Println(74, queryString)
-	rows, err := p.DB.Query(context.Background(), queryString, snilsparams...)
+	orderBy := " ORDER BY main.surname;"
+	query := queryFomSelectToFrom + tables + whereCondition + orderBy
+	fmt.Println(query)
+	rows, err := p.DB.Query(context.Background(), query, snilsparams...)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -90,7 +106,7 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 		fmt.Println(err)
 		return nil, err
 	}
-	return nil, nil
+	return pcts, nil
 }
 
 func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
