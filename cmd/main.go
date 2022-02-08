@@ -39,7 +39,8 @@ func main() {
 		},
 	}
 
-	//mapafromXML := preparedata.ImprooveDataPrepareU("13")
+	//mapafromXML := preparedata.ImprooveDataPrepareDate("11")
+	//fmt.Println(len(mapafromXML))
 
 	//mapafromuch := preparedata.Prepare1csv("1")
 	//for _, v := range mapafromuch {
@@ -50,7 +51,7 @@ func main() {
 	//	}
 	//}
 
-	//fmt.Println("длина в м", len(mapafromuch))
+	//fmt.Println("длина в м")
 
 	//os.Exit(0)
 	server := http.Server{

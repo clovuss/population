@@ -54,7 +54,7 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 		fmt.Println(err)
 	}
 
-	vs := view.Construct(paramsUser, numberUch, nil)
+	vs := view.Construct(paramsUser, numberUch, resDb)
 
 	vs.RenderHTML(w)
 	if err != nil {

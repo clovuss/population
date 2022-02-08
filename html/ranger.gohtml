@@ -72,12 +72,12 @@
    {{if .Enp}}<td>ЕНП</td> {{end}} {{$enp := .Enp}}
    {{if .Birthday}} <td>Дата рождения</td> {{end}} {{$bday := .Birthday}}
    {{if .Snils}}<td>СНИЛС</td> {{end}} {{$snils := .Snils}}
-   {{if .PrikAuto}}<td>ТипПрикреп</td> {{end}} {{$prikA := .PrikAuto}}
-   {{if .PrikDate}}<td>ДатаПрикреп</td> {{end}} {{$prikD := .PrikDate}}
+   {{if .PrikAuto}}<td>ТипП</td> {{end}} {{$prikA := .PrikAuto}}
+   {{if .PrikDate}}<td>ДатаП</td> {{end}} {{$prikD := .PrikDate}}
    {{if .UchZav}}<td>УчебЗав</td> {{end}} {{$uchZav := .UchZav}}
-   {{if .Document}}<td>Документ1</td><td>Документ2</td><td>Документ3</td> {{end}} {{$doc := .Document}}
+   {{if .Document}}<td>Тип</td><td>Серия</td><td>Номер</td><td>дата выдачи</td><td>орган выдачи</td> {{end}} {{$doc := .Document}}
    {{if .Adress}}<td>Город</td><td>НасПункт</td><td>Улица</td><td>Дом</td><td>Корпус</td><td>кв</td> {{end}} {{$adress := .Adress}}
- {{if .LiveAdress}}<td>Место жительства</td>{{end}} {{$liveAdress := .LiveAdress}}
+    {{if .LiveAdress}}<td>Место жительства</td>{{end}} {{$liveAdress := .LiveAdress}}
     {{if .Phone}}<td>Телефон</td>{{end}} {{$phone := .Phone}}
     {{if .CardNum}}<td>Карта</td>{{end}} {{$cardNum := .CardNum}}
 </tr>
@@ -93,19 +93,21 @@
          {{if $snils}}<td> {{.Snils}} </td>{{end}}
          {{if $prikA}}<td> {{ $localview.PrikrepView .PrikAuto}} </td>{{end}}
          {{if $prikD}}<td> {{$localview.DateFormat .PrikDate}} </td>{{end}}
-        {{if $uchZav}}<td> учеб зав </td>{{end}}
-        {{ if  $doc}} <td> док1 </td>{{end}}
-        {{ if  $doc}} <td> док2 </td>{{end}}
-        {{ if  $doc}} <td> док3 </td>{{end}}
+        {{if $uchZav}}<td> {{.UchZav}} </td>{{end}}
+        {{ if  $doc}} <td> {{.DocType}} </td>{{end}}
+        {{ if  $doc}} <td> {{.DocSeries}} </td>{{end}}
+        {{ if  $doc}} <td> {{.DocNumber}} </td>{{end}}
+        {{ if  $doc}} <td> {{.DocDate}} </td>{{end}}
+        {{ if  $doc}} <td> {{.Docorg}} </td>{{end}}
          {{if $adress}}<td> {{.City}} </td>{{end}}
          {{if $adress}}<td> {{.NasPunkt}} </td>{{end}}
          {{if $adress}}<td> {{.Street}} </td>{{end}}
          {{if $adress}}<td> {{.House}} </td>{{end}}
          {{if $adress}}<td> {{.Korp}} </td>{{end}}
          {{if $adress}}<td> {{.Kvart}} </td>{{end}}
-        {{if $liveAdress}}<td> Место жительства </td>{{end}}
-        {{if $phone}}<td> телефон </td>{{end}}
-        {{if $cardNum}}<td> карта </td>{{end}}
+        {{if $liveAdress}}<td> {{.LiveAdress}} </td>{{end}}
+        {{if $phone}}<td> {{.Phone}} </td>{{end}}
+        {{if $cardNum}}<td> {{.CardNum}} </td>{{end}}
 
 
 

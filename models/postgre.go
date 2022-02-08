@@ -23,9 +23,9 @@ func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
 	}
 	return pct, nil
 }
-
 func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*Pacient, error) {
 	pcts := make([]*Pacient, 0)
+
 	pctemp := &Pacient{}
 	rawsqlFields := make([]string, 0, len(params)+8)
 	rawsqlFields = append(rawsqlFields, "main.surname", "main.name", "main.patronymic", "main.gender") //Поля в БД
@@ -37,6 +37,7 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 	for key, _ := range params {
 		if key == "uch_zav" || key == "phone" || key == "card_num" || key == "live_adress" {
 			tables += " JOIN promed ON main.surname=promed.surname AND main.name=promed.name AND main.patronymic=promed.patronymic AND main.birthday=promed.birthday"
+			break
 		}
 	}
 	for k, _ := range params {
@@ -108,16 +109,16 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 	}
 	return pcts, nil
 }
-
 func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
 	stmt := `INSERT INTO main 
-		 (pid, enp, surname, name, patronymic, birthday, gender, snils, placebirth, 
-		rnname, city, naspunkt, street, house, korp, kvart, snilsdoc, prikrepdate, prikreptype) 
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19);`
+		 (pid, enp, surname, name, patronymic, birthday, gender, snils,
+		rnname, city, naspunkt, street, house, korp, kvart, snilsdoc, prikrepdate, prikreptype, doctype, docseries, docnumber,
+		  docdate, docorg) 
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23);`
 
 	_, err := p.DB.Exec(context.Background(), stmt, prikrep.Pid, prikrep.ENP, prikrep.FAM, prikrep.IM, prikrep.OT, prikrep.BIRTHDAY, prikrep.GENDER,
-		prikrep.SNILS, prikrep.PLACEOFBIRTH, prikrep.RNNAME, prikrep.CITY, prikrep.NP, prikrep.UL, prikrep.DOM, prikrep.KOR, prikrep.KV, prikrep.SSD,
-		prikrep.LPUDT, prikrep.LPUAUTO)
+		prikrep.SNILS, prikrep.RNNAME, prikrep.CITY, prikrep.NP, prikrep.UL, prikrep.DOM, prikrep.KOR, prikrep.KV, prikrep.SSD,
+		prikrep.LPUDT, prikrep.LPUAUTO, prikrep.DOCTP, prikrep.DOCS, prikrep.DOCN, prikrep.DOCDT, prikrep.DOCORG)
 	if err != nil {
 		return err
 	}

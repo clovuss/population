@@ -139,9 +139,9 @@ func ImprooveDataPrepare(f string) map[string]PRIKREP {
 	return pacients
 }
 
-//ImprooveDataPrepareU generates map os string with date format as dd.mm.yyyy
+//ImprooveDataPrepareDate generates map os string with date format as dd.mm.yyyy
 
-func ImprooveDataPrepareU(day string) map[string]PRIKREP {
+func ImprooveDataPrepareDate(day string) map[string]PRIKREP {
 	fp := "./data/PRIKREP_M300025_2201" + day + ".xml"
 	xmlfile, err := os.Open(fp)
 	if err != nil {
