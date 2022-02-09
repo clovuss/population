@@ -28,7 +28,7 @@ type View struct {
 	CardNum      bool
 	Phone        bool
 	Pacients     []*models.Pacient
-	//PacientsView [][]interface{}
+	Pacient      models.Pacient
 }
 
 func Construct(params map[string][]string, uch int, pac []*models.Pacient) *View {
@@ -51,7 +51,7 @@ func Construct(params map[string][]string, uch int, pac []*models.Pacient) *View
 	v := &View{
 		NumUch:   uch,
 		Fio:      "on",
-		Gender:   true,
+		Enp:      true,
 		Pacients: pac,
 		//PacientsView: pacsview,
 	}
@@ -61,8 +61,8 @@ func Construct(params map[string][]string, uch int, pac []*models.Pacient) *View
 			v.Adress = true
 		case "live_adress":
 			v.LiveAdress = true
-		case "enp":
-			v.Enp = true
+		case "gender":
+			v.Gender = true
 		case "birthday":
 			v.Birthday = true
 		case "snils":
@@ -101,10 +101,33 @@ func (v View) PrikrepView(p string) string {
 	return "З"
 }
 
-func (v *View) RenderHTML(w http.ResponseWriter) {
+func (v *View) RenderHTMLUch(w http.ResponseWriter) {
+	//tem, err := template.ParseFiles(
+	//	"./html/generator.gohtml",
+	//	"./html/main.gohtml")
 	tem, err := template.ParseFiles(
-		"./html/base.gohtml",
-		"./html/ranger.gohtml")
+		"./html/startranger.gohtml",
+
+		"./html/main.gohtml",
+
+		"./html/generator.gohtml",
+		"./html/end.gohtml")
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = tem.Execute(w, v)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+func (v *View) RenderHTMLEnp(w http.ResponseWriter) {
+	tem, err := template.ParseFiles(
+		"./html/startenp.gohtml",
+		"./html/main.gohtml",
+		"./html/byenp.gohtml",
+		"./html/end.gohtml")
 	if err != nil {
 		fmt.Println(err)
 	}

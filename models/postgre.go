@@ -12,12 +12,19 @@ type PacientDB struct {
 	DB *pgxpool.Pool
 }
 
-func (p *PacientDB) GetByPid(pid string) (*Pacient, error) {
-	stmt := "SELECT pid, enp, surname, name, patronymic, birthday, gender, snils, city, naspunkt, street, house, korp, kvart FROm main WHERE pid=$1;"
+func (p *PacientDB) GetByEnp(enp string) (*Pacient, error) {
+	stmt := `SELECT main.surname, main.name, main.patronymic, main.gender, main.enp, main.birthday, main.snils,  main.prikreptype, main.prikrepdate, 
+        main.doctype, main.docseries, main.docnumber, main.docdate, main.docorg, main.city, 
+main.naspunkt, main.street, main.house, main.korp, main.kvart, main.snilsdoc, coalesce(promed.uch_zav,  ''), coalesce(promed.card_num, ''),
+       coalesce(promed.live_adress, ''), coalesce(promed.phone, '')
+FROM main LEFT JOIN promed ON main.surname=promed.surname AND main.name=promed.name AND main.patronymic=promed.patronymic AND main.birthday=promed.birthday
+WHERE main.enp=$1;`
+	//stmt := "SELECT  enp, surname, name, patronymic, birthday, gender, snils, city, naspunkt, street, house, korp, kvart FROm main;"
 	pct := &Pacient{}
-	row := p.DB.QueryRow(context.Background(), stmt, pid)
-	err := row.Scan(&pct.Pid, &pct.Enp, &pct.Surname, &pct.Name, &pct.Patronymic, &pct.Birthday, &pct.Gender, &pct.Snils, &pct.City, &pct.NasPunkt, &pct.Street, &pct.House,
-		&pct.Korp, &pct.Kvart)
+	row := p.DB.QueryRow(context.Background(), stmt, enp)
+	err := row.Scan(&pct.Surname, &pct.Name, &pct.Patronymic, &pct.Gender, &pct.Enp, &pct.Birthday, &pct.Snils, &pct.PrikAuto, &pct.PrikDate,
+		&pct.DocType, &pct.DocSeries, &pct.DocNumber, &pct.DocDate, &pct.Docorg, &pct.City,
+		&pct.NasPunkt, &pct.Street, &pct.House, &pct.Korp, &pct.Kvart, &pct.SnilsDoc, &pct.UchZav, &pct.CardNum, &pct.LiveAdress, &pct.Phone)
 	if err != nil {
 		return nil, err
 	}
@@ -28,12 +35,10 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 
 	pctemp := &Pacient{}
 	rawsqlFields := make([]string, 0, len(params)+8)
-	rawsqlFields = append(rawsqlFields, "main.surname", "main.name", "main.patronymic", "main.gender") //Поля в БД
+	rawsqlFields = append(rawsqlFields, "main.surname", "main.name", "main.patronymic", "main.enp") //Поля в БД
 	destField := make([]interface{}, 0, len(params)+8)
-	destField = append(destField, &pctemp.Surname, &pctemp.Name, &pctemp.Patronymic, &pctemp.Gender)
+	destField = append(destField, &pctemp.Surname, &pctemp.Name, &pctemp.Patronymic, &pctemp.Enp)
 	tables := " FROM main"
-	fmt.Println(params)
-	//пересмотреть логику добавления джоина, он видимо вставляется много раз
 	for key, _ := range params {
 		if key == "uch_zav" || key == "phone" || key == "card_num" || key == "live_adress" {
 			tables += " JOIN promed ON main.surname=promed.surname AND main.name=promed.name AND main.patronymic=promed.patronymic AND main.birthday=promed.birthday"
@@ -42,8 +47,8 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 	}
 	for k, _ := range params {
 		switch k {
-		case "enp":
-			destField = append(destField, &pctemp.Enp)
+		case "gender":
+			destField = append(destField, &pctemp.Gender)
 			rawsqlFields = append(rawsqlFields, "main."+k)
 		case "birthday":
 			destField = append(destField, &pctemp.Birthday)
@@ -85,9 +90,9 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 		snilsparams = append(snilsparams, snilsdoc[1])
 		whereCondition += " OR main.snilsdoc=$2"
 	}
-	orderBy := " ORDER BY main.surname;"
+	orderBy := " ORDER BY main.birthday desc;"
 	query := queryFomSelectToFrom + tables + whereCondition + orderBy
-	fmt.Println(query)
+	//fmt.Println(query)
 	rows, err := p.DB.Query(context.Background(), query, snilsparams...)
 	if err != nil {
 		fmt.Println(err)

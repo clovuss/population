@@ -1,0 +1,27 @@
+{{define "viewbyenp"}}
+  <p> Фамилия: {{.Pacient.Surname}}</p>
+  <p> Имя: {{.Pacient.Name}}</p>
+  <p>Отчество: {{.Pacient.Patronymic}}</p>
+  <p>Пол: {{.GenderView .Pacient.Gender}}</p>
+  <p>Дата рождения: {{.DateFormat .Pacient.Birthday}}</p>
+  <p>СНИЛС: {{.Pacient.Snils}}</p>
+  <p>Дата прикрепления: {{.DateFormat .Pacient.PrikDate}}</p>
+  <p>Тип прикрепления: {{.PrikrepView .Pacient.PrikAuto}}</p>
+  <p>Тип документа: {{.Pacient.DocType}}</p>
+  <p>Серия документа: {{.Pacient.DocSeries}}</p>
+  <p>Номер документа: {{.Pacient.DocNumber}}</p>
+  <p>Дата выдачи документа: {{.Pacient.DocDate}}</p>
+  <p>Орган выдачи документа: {{.Pacient.Docorg}}</p>
+  <p>Регистрация:
+    {{.Pacient.City}}
+    Нас. пункт {{.Pacient.NasPunkt}}
+    Улица {{.Pacient.Street}}
+    {{.Pacient.House}},
+    {{.Pacient.Korp}},
+    {{.Pacient.Kvart}} </p>
+  <p>Место жительства {{.Pacient.LiveAdress}}</p>
+  <p>Участок {{.Pacient.SnilsDoc}}</p>
+  <p>Номер карты {{.Pacient.CardNum}}</p>
+  <p>Номер телефона {{.Pacient.Phone}}</p>
+  <p>Учебное заведение {{.Pacient.UchZav}}</p>
+{{end}}

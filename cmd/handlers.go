@@ -23,7 +23,7 @@ func (app *application) home(w http.ResponseWriter, req *http.Request) {
 	//}
 }
 
-func (app *application) view(w http.ResponseWriter, req *http.Request) {
+func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 	//get view options from user
 	err := req.ParseForm()
 	if err != nil {
@@ -32,9 +32,9 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 
 	paramsUser := make(map[string][]string)
 	paramsUser = req.Form
-	//fmt.Println(paramsUser)
+	fmt.Println(paramsUser)
 
-	numberUch, err := strconv.Atoi(req.URL.Path[len("/view/"):])
+	numberUch, err := strconv.Atoi(req.URL.Path[len("/uch/"):])
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -44,7 +44,6 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resDb, err := app.Repo.GetByUch(paramsUser, app.snilsdoc[numberUch])
-	fmt.Println(resDb[0])
 
 	if err != nil {
 		fmt.Println("mistake from handler", err)
@@ -56,9 +55,31 @@ func (app *application) view(w http.ResponseWriter, req *http.Request) {
 
 	vs := view.Construct(paramsUser, numberUch, resDb)
 
-	vs.RenderHTML(w)
+	vs.RenderHTMLUch(w)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+}
+func (app *application) viewbyEnp(w http.ResponseWriter, req *http.Request) {
+
+	enpfromuser := req.URL.Path[len("/enp/"):]
+	if len(enpfromuser) != 16 {
+		http.NotFound(w, req)
+		return
+	}
+	enp, err := strconv.Atoi(enpfromuser)
+	rz := strconv.Itoa(enp)
+	if err != nil {
+		fmt.Println(err)
+	}
+	p, err := app.Repo.GetByEnp(rz)
+	if err != nil {
+		fmt.Println(err)
+	}
+	v := view.View{Pacient: *p}
+	v.RenderHTMLEnp(w)
+
+	fmt.Println(p)
 
 }

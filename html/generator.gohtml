@@ -1,21 +1,19 @@
 {{define "ranger"}}
-<!-- <details> -->
-<!-- <summary>Выбор полей</summary> -->
-    {{$localview := .}}
-    <form method="get" action="/view/{{.NumUch}}">
+   {{$localview := .}}
+    <form method="get" action="/uch/{{.NumUch}}">
+        <div>
+            <input type="checkbox" id="enp" checked>
+            <label for="enp"> ЕНП</label>
+        </div>
     <div>
         <input type="checkbox" id="fio" checked>
         <label for="fio">ФИО</label>
     </div>
     <div>
-        <input type="checkbox" id="gender" checked >
+        <input type="checkbox" name="gender" id="gender" {{ if .Gender}} checked {{end}} >
         <label for="gender">Пол</label>
     </div>
-    <div>
-        <input type="checkbox" id="enp" name = "enp"  {{ if .Enp}} checked {{end}}>
-        <label for="enp">ЕНП</label>
-    </div>
-    <div>
+        <div>
         <input type="checkbox"  name="birthday" id="birthday"{{ if .Birthday}} checked {{end}} >
         <label for="birthday">Дата рождения</label>
     </div>
@@ -65,11 +63,12 @@
 <table class="main_table">
     <thead>
 <tr>
+    {{if .Enp}}<td>ЕНП</td> {{end}}
    {{if .Fio}} <td>Фамилия</td> {{end}}
    {{if .Fio}} <td>Имя</td> {{end}}
    {{if .Fio}} <td>Отчество</td> {{end}}
-   {{if .Gender}} <td>Пол</td> {{end}}
-   {{if .Enp}}<td>ЕНП</td> {{end}} {{$enp := .Enp}}
+   {{if .Gender}} <td>Пол</td> {{end}}{{$gender := .Gender}}
+
    {{if .Birthday}} <td>Дата рождения</td> {{end}} {{$bday := .Birthday}}
    {{if .Snils}}<td>СНИЛС</td> {{end}} {{$snils := .Snils}}
    {{if .PrikAuto}}<td>ТипП</td> {{end}} {{$prikA := .PrikAuto}}
@@ -84,11 +83,12 @@
     </thead>
     {{range .Pacients}}
     <tr>
+         <td> <a href="/enp/{{.Enp}}">{{.Enp}}</a></td>
          <td>{{.Surname}}</td>
          <td>{{.Name}}</td>
          <td>{{.Patronymic}} </td>
-         <td> {{ $localview.GenderView .Gender}} </td>
-         {{if $enp}} <td> {{.Enp}}</td>{{end}}
+{{/*         <td> {{ $localview.GenderView .Gender}} </td>*/}}
+         {{if $gender}} <td> {{$localview.GenderView .Gender}}</td>{{end}}
          {{if $bday}} <td> {{ $localview.DateFormat .Birthday}} </td>{{end}}
          {{if $snils}}<td> {{.Snils}} </td>{{end}}
          {{if $prikA}}<td> {{ $localview.PrikrepView .PrikAuto}} </td>{{end}}
@@ -116,3 +116,4 @@
 
 </table>
 {{end}}
+
