@@ -1,0 +1,11 @@
+{{define "editbyenp"}}
+
+  <p> Фамилия: {{.Pacient.Surname}}
+   Имя: {{.Pacient.Name}}
+  Отчество: {{.Pacient.Patronymic}}</p>
+
+  <p>Номер карты {{.Pacient.CardNum}}</p>
+  <p>Текущий номер телефона {{.Pacient.Phone}}</p>
+  <p>Учебное заведение {{.Pacient.UchZav}}</p>
+  <p><a href="/editenp/{{.Pacient.Enp}}">Сохранить данные</a></p>
+{{end}}

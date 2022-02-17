@@ -32,22 +32,6 @@ type View struct {
 }
 
 func Construct(params map[string][]string, uch int, pac []*models.Pacient) *View {
-	//if len(pac) == 0 {
-	//	return nil
-	//}
-	//pacsview := make([][]interface{}, 0)
-	//for _, v := range pac {
-	//	vl := reflect.ValueOf(*v)
-	//	if vl.Kind() != reflect.Struct {
-	//		return nil
-	//	}
-	//	out := make([]interface{}, vl.NumField())
-	//	for i := 0; i < vl.NumField(); i++ {
-	//		out[i] = vl.Field(i).Interface()
-	//	}
-	//	pacsview = append(pacsview, out)
-	//}
-
 	v := &View{
 		NumUch:   uch,
 		Fio:      "on",
@@ -101,10 +85,21 @@ func (v View) PrikrepView(p string) string {
 	return "З"
 }
 
+func (v View) Adder(i int) int {
+	return i + 1
+}
+
 func (v *View) RenderHTMLUch(w http.ResponseWriter) {
 	//tem, err := template.ParseFiles(
 	//	"./html/generator.gohtml",
 	//	"./html/main.gohtml")
+	//tem, err := template.ParseFiles(
+	//	"./html/1.gohtml",
+	//
+	//	"./html/2.gohtml",
+	//
+	//	"./html/3.gohtml")
+
 	tem, err := template.ParseFiles(
 		"./html/startranger.gohtml",
 
@@ -127,6 +122,21 @@ func (v *View) RenderHTMLEnp(w http.ResponseWriter) {
 		"./html/startenp.gohtml",
 		"./html/main.gohtml",
 		"./html/byenp.gohtml",
+		"./html/end.gohtml")
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = tem.Execute(w, v)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+func (v *View) RenderHTMLEditEnp(w http.ResponseWriter) {
+	tem, err := template.ParseFiles(
+		"./html/starteditenp.gohtml",
+		"./html/main.gohtml",
+		"./html/editbyenp.gohtml",
 		"./html/end.gohtml")
 	if err != nil {
 		fmt.Println(err)

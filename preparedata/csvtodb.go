@@ -19,7 +19,7 @@ func Prepare1csv(uch string) map[string][]string {
 	myReader.Comma = ';'
 	line := make(map[string][]string, 7)
 	c := 0
-	mapaXML := ImprooveDataPrepareDate("13")
+	mapaXML := XmlToMapPrikrep("13")
 
 	for {
 

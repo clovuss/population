@@ -1,4 +1,5 @@
 {{define "viewbyenp"}}
+  <p>Единый номер полиса: {{.Pacient.Enp}}</p>
   <p> Фамилия: {{.Pacient.Surname}}</p>
   <p> Имя: {{.Pacient.Name}}</p>
   <p>Отчество: {{.Pacient.Patronymic}}</p>
@@ -23,5 +24,19 @@
   <p>Участок {{.Pacient.SnilsDoc}}</p>
   <p>Номер карты {{.Pacient.CardNum}}</p>
   <p>Номер телефона {{.Pacient.Phone}}</p>
+    <form method="post" autocomplete="off">
+      <div>
+
+        <input  name="phone" type="text" placeholder="Введите новый номер" >
+      </div>
+           <input type="submit" value="Сохранить">
+    </form>
   <p>Учебное заведение {{.Pacient.UchZav}}</p>
+  <form method="post" autocomplete="off">
+        <div>
+      <input  name="uch_zav" type="text" placeholder="школа или сад" >
+    </div>
+    <input type="submit" value="Сохранить">
+  </form>
+  <p><a href="/editenp/{{.Pacient.Enp}}">Редактировать данные</a></p>
 {{end}}

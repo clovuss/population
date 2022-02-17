@@ -29,7 +29,6 @@ func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	paramsUser := make(map[string][]string)
 	paramsUser = req.Form
 	fmt.Println(paramsUser)
@@ -61,6 +60,15 @@ func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 	}
 
 }
+func (app *application) Vr(enp string) (*view.View, error) {
+	p, err := app.Repo.GetByEnp(enp)
+	if err != nil {
+		fmt.Println(err)
+	}
+	v := &view.View{Pacient: *p}
+	return v, nil
+}
+
 func (app *application) viewbyEnp(w http.ResponseWriter, req *http.Request) {
 
 	enpfromuser := req.URL.Path[len("/enp/"):]
@@ -73,13 +81,35 @@ func (app *application) viewbyEnp(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	p, err := app.Repo.GetByEnp(rz)
-	if err != nil {
-		fmt.Println(err)
-	}
-	v := view.View{Pacient: *p}
-	v.RenderHTMLEnp(w)
+	app.View, err = app.Vr(rz)
 
-	fmt.Println(p)
+	if err != nil {
+		return
+	}
+	app.View.RenderHTMLEnp(w)
+
+}
+
+func (app *application) editbyEnp(w http.ResponseWriter, req *http.Request) {
+	enpfromuser := req.URL.Path[len("/editenp/"):]
+	if len(enpfromuser) != 16 {
+		http.NotFound(w, req)
+		return
+	}
+	enp, err := strconv.Atoi(enpfromuser)
+	//обработать ошибку
+
+	if err != nil {
+		return
+	}
+
+	rz := strconv.Itoa(enp)
+
+	if app.View == nil {
+		app.View, err = app.Vr(rz)
+	}
+
+	//fmt.Println(app.View)
+	app.View.RenderHTMLEditEnp(w)
 
 }
