@@ -1,5 +1,6 @@
 {{define "ranger"}}
    {{$localview := .}}
+   <p>Информация с ФОМС обновлена на {{$localview.DateFormat .LastUpdate}}</p>
     <form method="get" action="/uch/{{.NumUch}}">
         <div>
             <input type="checkbox" id="enp" checked>

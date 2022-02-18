@@ -29,43 +29,44 @@ type View struct {
 	Phone        bool
 	Pacients     []*models.Pacient
 	Pacient      models.Pacient
+	LastUpdate   time.Time
 }
 
-func Construct(params map[string][]string, uch int, pac []*models.Pacient) *View {
-	v := &View{
+func (v *View) Construct(params map[string][]string, uch int, pac []*models.Pacient) *View {
+	viewToTemplate := &View{
 		NumUch:   uch,
 		Fio:      "on",
 		Enp:      true,
 		Pacients: pac,
-		//PacientsView: pacsview,
 	}
+
 	for k, _ := range params {
 		switch k {
 		case "adress":
-			v.Adress = true
+			viewToTemplate.Adress = true
 		case "live_adress":
-			v.LiveAdress = true
+			viewToTemplate.LiveAdress = true
 		case "gender":
-			v.Gender = true
+			viewToTemplate.Gender = true
 		case "birthday":
-			v.Birthday = true
+			viewToTemplate.Birthday = true
 		case "snils":
-			v.Snils = true
+			viewToTemplate.Snils = true
 		case "prikreptype":
-			v.PrikAuto = true
+			viewToTemplate.PrikAuto = true
 		case "prikrepdate":
-			v.PrikDate = true
+			viewToTemplate.PrikDate = true
 		case "phone":
-			v.Phone = true
+			viewToTemplate.Phone = true
 		case "document":
-			v.Document = true
+			viewToTemplate.Document = true
 		case "card_num":
-			v.CardNum = true
+			viewToTemplate.CardNum = true
 		case "uch_zav":
-			v.UchZav = true
+			viewToTemplate.UchZav = true
 		}
 	}
-	return v
+	return viewToTemplate
 }
 
 func (v View) DateFormat(t time.Time) string {

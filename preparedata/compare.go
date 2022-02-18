@@ -20,7 +20,7 @@ func CompareFiles() (in, out map[string]PRIKREP) {
 	}
 	if len(xml) != 2 {
 		fmt.Println("Недостаточно файлов хмл для сравнения")
-		os.Exit(0)
+		return nil, nil
 	}
 	var past, present string // имена файлов
 	if getDateFromXml(xml[0]).Before(getDateFromXml(xml[1])) {
@@ -32,25 +32,25 @@ func CompareFiles() (in, out map[string]PRIKREP) {
 	in = map[string]PRIKREP{}
 	a := XmlToMapPrikrep(past)
 	b := XmlToMapPrikrep(present)
-	for k, _ := range a { // перебор прошлой мапы //убывающие
+	for k := range a { // перебор прошлой мапы //убывающие
 		_, ok := b[k] //смотрим есть ли в новой мапе этот человек
 		if !ok {
 			//fmt.Println(k) //делаем новый список людей убывабщих
 			out[k] = a[k]
 		}
 	}
-	fmt.Println(out)
+	//fmt.Println(out)
 	a, b = b, a
-	for k, _ := range a { // перебор прошлой мапы //прибывающие
+	for k := range a { // перебор прошлой мапы //прибывающие
 		_, ok := b[k] //смотрим есть ли в новой мапе этот человек
 		if !ok {
 			//fmt.Println(k) //делаем новый список людей убывабщих
 			in[k] = a[k]
 		}
 	}
-	fmt.Println(in)
-	if err := os.Remove(past); err != nil {
-		fmt.Println(err)
-	}
+	//fmt.Println(in)
+	//if err := os.Remove(past); err != nil {
+	//	fmt.Println(err)
+	//}
 	return in, out
 }

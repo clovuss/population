@@ -6,6 +6,7 @@ import (
 	"github.com/clovuss/population/preparedata"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"strings"
+	"time"
 )
 
 type PacientDB struct {
@@ -21,6 +22,7 @@ FROM main LEFT JOIN promed ON main.surname=promed.surname AND main.name=promed.n
 WHERE main.enp=$1;`
 	//stmt := "SELECT  enp, surname, name, patronymic, birthday, gender, snils, city, naspunkt, street, house, korp, kvart FROm main;"
 	pct := &Pacient{}
+
 	row := p.DB.QueryRow(context.Background(), stmt, enp)
 	err := row.Scan(&pct.Surname, &pct.Name, &pct.Patronymic, &pct.Gender, &pct.Enp, &pct.Birthday, &pct.Snils, &pct.PrikAuto, &pct.PrikDate,
 		&pct.DocType, &pct.DocSeries, &pct.DocNumber, &pct.DocDate, &pct.Docorg, &pct.City,
@@ -114,8 +116,8 @@ func (p *PacientDB) GetByUch(params map[string][]string, snilsdoc []string) ([]*
 	}
 	return pcts, nil
 }
-func (p *PacientDB) InnsertAll(prikrep preparedata.PRIKREP) error {
-	stmt := `INSERT INTO main 
+func (p *PacientDB) InsertOne(prikrep preparedata.PRIKREP, tablename string) error {
+	stmt := `INSERT INTO ` + tablename + ` 
 		 (pid, enp, surname, name, patronymic, birthday, gender, snils,
 		rnname, city, naspunkt, street, house, korp, kvart, snilsdoc, prikrepdate, prikreptype, doctype, docseries, docnumber,
 		  docdate, docorg) 
@@ -156,12 +158,21 @@ func (p *PacientDB) InsertPromed(csvslice []string) error {
 	return nil
 
 }
-func (p *PacientDB) InnsertOne(prikrep interface{}) error {
-	stmt := "INSERT INTO main (pid) VALUES($1);"
-	_, err := p.DB.Exec(context.Background(), stmt, prikrep)
+func (p *PacientDB) DeleteByOne(enp string) error {
+	stmt := `delete from main where enp=$1;`
+	_, err := p.DB.Exec(context.Background(), stmt, enp)
 	if err != nil {
 		return err
 	}
 	return nil
-
+}
+func (p *PacientDB) GetLAstUpdate() (time.Time, error) {
+	stmt := `select max(prikrepdate) from main;`
+	var lastupdate time.Time
+	row := p.DB.QueryRow(context.Background(), stmt)
+	err := row.Scan(&lastupdate)
+	if err != nil {
+		return lastupdate, err
+	}
+	return lastupdate, nil
 }

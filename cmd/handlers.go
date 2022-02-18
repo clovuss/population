@@ -31,7 +31,6 @@ func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 	}
 	paramsUser := make(map[string][]string)
 	paramsUser = req.Form
-	fmt.Println(paramsUser)
 
 	numberUch, err := strconv.Atoi(req.URL.Path[len("/uch/"):])
 	if err != nil {
@@ -48,11 +47,12 @@ func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("mistake from handler", err)
 	}
 
+	vs := app.View.Construct(paramsUser, numberUch, resDb)
+	vs.LastUpdate, err = app.Repo.GetLAstUpdate()
 	if err != nil {
 		fmt.Println(err)
-	}
 
-	vs := view.Construct(paramsUser, numberUch, resDb)
+	}
 
 	vs.RenderHTMLUch(w)
 	if err != nil {
@@ -60,6 +60,7 @@ func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 	}
 
 }
+
 func (app *application) Vr(enp string) (*view.View, error) {
 	p, err := app.Repo.GetByEnp(enp)
 	if err != nil {
@@ -112,4 +113,12 @@ func (app *application) editbyEnp(w http.ResponseWriter, req *http.Request) {
 	//fmt.Println(app.View)
 	app.View.RenderHTMLEditEnp(w)
 
+}
+
+func (app *application) checkLastupdate(w http.ResponseWriter, req *http.Request) {
+
+}
+
+func (app *application) update(w http.ResponseWriter, req *http.Request) {
+	app.Updatedatabase()
 }
