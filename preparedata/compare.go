@@ -6,51 +6,78 @@ import (
 	"strings"
 )
 
-// CompareFiles returns 2 maps
-func CompareFiles() (in, out map[string]PRIKREP) {
+// SearchFiles возвращает список файлов
+func SearchFiles() ([]os.FileInfo, error) {
 	dir, err := os.ReadDir("./data")
 	if err != nil {
 		fmt.Println(err)
+		return nil, err
 	}
-	xml := make([]string, 0, 2)
+	xmlInfos := make([]os.FileInfo, 0, 2)
 	for _, entry := range dir {
 		if strings.Contains(entry.Name(), "PRIKREP_M300025_") {
-			xml = append(xml, "./data/"+entry.Name())
+			info, err := entry.Info()
+			if err != nil {
+				fmt.Println(err)
+				return nil, err
+			}
+			xmlInfos = append(xmlInfos, info)
 		}
 	}
-	if len(xml) != 2 {
-		fmt.Println("Недостаточно файлов хмл для сравнения")
-		return nil, nil
+
+	if len(xmlInfos) == 1 {
+		return xmlInfos, nil
 	}
-	var past, present string // имена файлов
-	if getDateFromXml(xml[0]).Before(getDateFromXml(xml[1])) {
-		past, present = xml[0], xml[1]
+	err = fmt.Errorf("проверьте файлы в папке")
+	if len(xmlInfos) != 2 {
+		return nil, err
+	}
+	if xmlInfos[0].ModTime().After(xmlInfos[1].ModTime()) {
+		return xmlInfos, nil
 	} else {
-		past, present = xml[1], xml[0]
+		xmlInfos[0], xmlInfos[1] = xmlInfos[1], xmlInfos[0]
+		return xmlInfos, nil
 	}
+
+}
+
+//CompareFiles возвращает список прибывшых и убывших
+func CompareFiles(xml []os.FileInfo) (in, out map[string]PRIKREP, err error) {
 	out = map[string]PRIKREP{}
 	in = map[string]PRIKREP{}
-	a := XmlToMapPrikrep(past)
-	b := XmlToMapPrikrep(present)
+	a := XmlToMapPrikrep("./data/" + xml[1].Name())
+	b := XmlToMapPrikrep("./data/" + xml[0].Name())
+
 	for k := range a { // перебор прошлой мапы //убывающие
-		_, ok := b[k] //смотрим есть ли в новой мапе этот человек
+		_, ok := b[k] //берем ключ от мапы а и по этому ключу смотрим в б. если нет, в новой мапе нет человека, т.е. он убыл
 		if !ok {
 			//fmt.Println(k) //делаем новый список людей убывабщих
 			out[k] = a[k]
+
 		}
 	}
-	//fmt.Println(out)
+
 	a, b = b, a
-	for k := range a { // перебор прошлой мапы //прибывающие
+	for k := range a { // перебор текущей мапы //прибывающие
 		_, ok := b[k] //смотрим есть ли в новой мапе этот человек
 		if !ok {
 			//fmt.Println(k) //делаем новый список людей убывабщих
 			in[k] = a[k]
+
 		}
 	}
-	//fmt.Println(in)
-	//if err := os.Remove(past); err != nil {
-	//	fmt.Println(err)
-	//}
-	return in, out
+
+	return in, out, nil
+
+}
+func Dbservice() (in, out map[string]PRIKREP, err error) {
+	files, err := SearchFiles()
+	if err != nil {
+		fmt.Println(err)
+		return nil, nil, err
+	}
+
+	in, out, err = CompareFiles(files)
+	return in, out, nil
+
 }

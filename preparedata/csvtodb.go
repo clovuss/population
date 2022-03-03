@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -103,4 +104,24 @@ func telValidator(str string) []string {
 	}
 
 	return output
+}
+
+func NewtelValidator(str string) (int, error) {
+	newtelstring := ""
+	for _, v := range str {
+		if unicode.IsDigit(v) {
+			d := fmt.Sprintf("%c", v)
+			newtelstring += d
+		}
+	}
+	if len(newtelstring) != 10 {
+		err := fmt.Errorf("безобразный номер")
+		return 0, err
+	}
+	phoneNumber, err := strconv.Atoi(newtelstring)
+	if err != nil {
+		return 0, err
+	}
+
+	return phoneNumber, nil
 }

@@ -202,7 +202,7 @@ func XmlToMapPrikrep(file string) map[string]PRIKREP {
 	return pacients
 }
 
-func getDateFromXml(file string) time.Time {
+func GetDateFromXml(file string) time.Time {
 	xmlfile, err := os.Open(file)
 	if err != nil {
 		fmt.Println(err)

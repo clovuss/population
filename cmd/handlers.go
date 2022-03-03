@@ -2,25 +2,18 @@ package main
 
 import (
 	"fmt"
+	"github.com/clovuss/population/preparedata"
 	"github.com/clovuss/population/view"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 //home returns  start page
 func (app *application) home(w http.ResponseWriter, req *http.Request) {
-	//tem, err := template.ParseFiles(
-	//	"./ui/html/base.gohtml",
-	//	"./ui/html/ranger.gohtml")
-	_, err := w.Write([]byte("hello"))
-	if err != nil {
-		fmt.Println(err)
+	if req.URL.Path == "/" {
+		http.Redirect(w, req, "/uch/1", 303)
 	}
-
-	//err = tem.Execute(w, "Hello from home")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
 }
 
 func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
@@ -47,13 +40,11 @@ func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("mistake from handler", err)
 	}
 
-	vs := app.View.Construct(paramsUser, numberUch, resDb)
-	vs.LastUpdate, err = app.Repo.GetLAstUpdate()
+	quantityUch := len(resDb)
+	vs := app.View.Construct(paramsUser, numberUch, resDb, quantityUch, app.Quantity, app.LastUpdateDB)
 	if err != nil {
 		fmt.Println(err)
-
 	}
-
 	vs.RenderHTMLUch(w)
 	if err != nil {
 		fmt.Println(err)
@@ -61,7 +52,7 @@ func (app *application) viewbyUch(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func (app *application) Vr(enp string) (*view.View, error) {
+func (app *application) viewPacient(enp string) (*view.View, error) {
 	p, err := app.Repo.GetByEnp(enp)
 	if err != nil {
 		fmt.Println(err)
@@ -82,7 +73,25 @@ func (app *application) viewbyEnp(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	app.View, err = app.Vr(rz)
+	if req.Method == http.MethodPost {
+		err = req.ParseForm()
+		if err != nil {
+			return
+		}
+		rawNumberPhone := req.PostForm.Get("phone")
+		tel, err := preparedata.NewtelValidator(rawNumberPhone)
+		if err != nil {
+			fmt.Println(err)
+		}
+		t := strconv.Itoa(tel)
+		err = app.Repo.UpdatePhone(t, enpfromuser)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+	}
+
+	app.View, err = app.viewPacient(rz)
 
 	if err != nil {
 		return
@@ -91,34 +100,66 @@ func (app *application) viewbyEnp(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func (app *application) editbyEnp(w http.ResponseWriter, req *http.Request) {
-	enpfromuser := req.URL.Path[len("/editenp/"):]
-	if len(enpfromuser) != 16 {
-		http.NotFound(w, req)
+func (app *application) update(w http.ResponseWriter, req *http.Request) {
+	//поискали файлы.  Возващается дата формирования самого свежего файла
+	files, err := preparedata.SearchFiles()
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		fmt.Println(err)
 		return
 	}
-	enp, err := strconv.Atoi(enpfromuser)
-	//обработать ошибку
+	d := time.Hour * 24
+	dateOfLastFile := files[0].ModTime().AddDate(0, 0, -1)
 
+	if len(files) == 1 {
+		if dateOfLastFile.Sub(app.LastUpdateDB) < d {
+			//sincelastupdate := time.Since(dateOfLastFile)
+
+			//_, err := w.Write([]byte("сведения из базы данных соответствуют загруженным файлам. Обновление было"+fmt.Fprintf(sincelastupdate.Truncate(24 * time.Hour).Hours())))
+			fmt.Fprint(w, "сведения из базы данных соответствуют загруженным файлам. Обновление сделано с файла, скачанного ", time.Since(files[0].ModTime()).Hours(), " часов назад.")
+			if err != nil {
+				return
+			}
+			return
+		} else {
+			_, err := w.Write([]byte("большое расхождение между датой xml-файла и датой обновления бд"))
+			if err != nil {
+				return
+			}
+			return
+		}
+	}
+	err = app.Updatedatabase()
+	if err != nil {
+		fmt.Fprint(w, err)
+
+		return
+	}
+	app.LastUpdateDB, err = app.Repo.GetLAstUpdate()
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	app.Quantity, err = app.Repo.GetLQuantity()
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	fmt.Fprint(w, "сведения обновлены на ", app.LastUpdateDB, ". Население: ", app.Quantity, " детей.")
+
+}
+
+func (app *application) find(writer http.ResponseWriter, req *http.Request) {
+	err := req.ParseForm()
 	if err != nil {
 		return
 	}
+	paramsUser := make(map[string][]string)
+	paramsUser = req.Form
 
-	rz := strconv.Itoa(enp)
+	fmt.Println(paramsUser)
+	res, err := app.Repo.FindByName(paramsUser)
+	if err != nil {
+		fmt.Println(err)
 
-	if app.View == nil {
-		app.View, err = app.Vr(rz)
 	}
-
-	//fmt.Println(app.View)
-	app.View.RenderHTMLEditEnp(w)
-
-}
-
-func (app *application) checkLastupdate(w http.ResponseWriter, req *http.Request) {
-
-}
-
-func (app *application) update(w http.ResponseWriter, req *http.Request) {
-	app.Updatedatabase()
+	fmt.Println(len(res))
 }

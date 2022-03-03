@@ -1,13 +1,13 @@
-{{define "base" }}
+{{define "base"  }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
  <link rel='stylesheet' href='/static/css/style.css'>
-  <title>Старт</title>
+  <title>Население ДГП4</title>
 </head>
 
-
+{{/* {{ if .QuantityAll}} Население:  {{end}}*/}}
  <p>Выберите участок
  <a href="/uch/1">1</a>
  <a href="/uch/2">2</a>
@@ -23,8 +23,20 @@
  <a href="/uch/12">12</a>
   </p>
 <br>
-</body>
-</html>
+
+  <form method="get" autocomplete="off" action="/find/">
+   <div>
+    <input type="text" name="surname" placeholder="фамилия">
+     </div>
+   <div>
+    <input type="text" name="name" placeholder="имя">
+   </div>
+   <div>
+    <input type="text" name="patronymic" placeholder="отчество">
+   </div>
+   <input type="submit" value="искать">
+  </form>
+
 {{end}}
 
 

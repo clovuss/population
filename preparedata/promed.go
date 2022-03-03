@@ -25,14 +25,6 @@ func PreparePromedCsv() [][]string {
 			break
 		}
 		line := make([]string, 8)
-		//line[0] = record[0] //карднум
-		//line[1] = record[1] //фамилия
-		//line[2] = record[2]
-		//line[3] = record[3]//отчество
-		//line[4] = record[4]//др
-		//line[5] = record[5]//прописка
-		//line[6] = record[6] //мж
-		//line[8] = record[8]
 		line = record[:7]
 		line = append(line, record[8])
 		output = append(output, line)

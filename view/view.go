@@ -30,14 +30,20 @@ type View struct {
 	Pacients     []*models.Pacient
 	Pacient      models.Pacient
 	LastUpdate   time.Time
+	QuantityUch  int
+	QuantityAll  int
 }
 
-func (v *View) Construct(params map[string][]string, uch int, pac []*models.Pacient) *View {
+func (v *View) Construct(params map[string][]string, uch int, pac []*models.Pacient, qu int, qa int, lupdate time.Time) *View {
 	viewToTemplate := &View{
-		NumUch:   uch,
-		Fio:      "on",
-		Enp:      true,
-		Pacients: pac,
+		NumUch:      uch,
+		Fio:         "on",
+		Enp:         true,
+		Pacients:    pac,
+		QuantityUch: qu,
+		QuantityAll: qa,
+
+		LastUpdate: lupdate,
 	}
 
 	for k, _ := range params {
@@ -91,24 +97,11 @@ func (v View) Adder(i int) int {
 }
 
 func (v *View) RenderHTMLUch(w http.ResponseWriter) {
-	//tem, err := template.ParseFiles(
-	//	"./html/generator.gohtml",
-	//	"./html/main.gohtml")
-	//tem, err := template.ParseFiles(
-	//	"./html/1.gohtml",
-	//
-	//	"./html/2.gohtml",
-	//
-	//	"./html/3.gohtml")
-
 	tem, err := template.ParseFiles(
 		"./html/startranger.gohtml",
-
 		"./html/main.gohtml",
-
 		"./html/generator.gohtml",
 		"./html/end.gohtml")
-
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -116,7 +109,6 @@ func (v *View) RenderHTMLUch(w http.ResponseWriter) {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 }
 func (v *View) RenderHTMLEnp(w http.ResponseWriter) {
 	tem, err := template.ParseFiles(

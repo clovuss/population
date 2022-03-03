@@ -24,10 +24,10 @@
   <p>Участок {{.Pacient.SnilsDoc}}</p>
   <p>Номер карты {{.Pacient.CardNum}}</p>
   <p>Номер телефона {{.Pacient.Phone}}</p>
-    <form method="post" autocomplete="off">
+    <form method="post" autocomplete="off" action="/enp/{{.Pacient.Enp}}">
       <div>
 
-        <input  name="phone" type="text" placeholder="Введите новый номер" >
+        <input  name="phone" type="text" placeholder="Введите номер, 10 цифр" >
       </div>
            <input type="submit" value="Сохранить">
     </form>
@@ -36,7 +36,7 @@
         <div>
       <input  name="uch_zav" type="text" placeholder="школа или сад" >
     </div>
-    <input type="submit" value="Сохранить">
+    <input type="submit" value="искать">
   </form>
-  <p><a href="/editenp/{{.Pacient.Enp}}">Редактировать данные</a></p>
+
 {{end}}
