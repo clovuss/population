@@ -147,16 +147,31 @@ func (app *application) update(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func (app *application) find(writer http.ResponseWriter, req *http.Request) {
+func (app *application) find(w http.ResponseWriter, req *http.Request) {
 	err := req.ParseForm()
 	if err != nil {
 		return
 	}
 	paramsUser := make(map[string][]string)
 	paramsUser = req.Form
+	isepmty := true
+	for _, strings := range paramsUser {
+		if strings[0] != "" {
+			isepmty = false
+		}
+	}
 
 	fmt.Println(paramsUser)
+	if isepmty {
+		fmt.Fprint(w, "введите данные для поиска")
+		return
+	}
 	res, err := app.Repo.FindByName(paramsUser)
+
+	v := &view.View{Pacients: res}
+
+	v.RenderHTMLUch(w)
+
 	if err != nil {
 		fmt.Println(err)
 

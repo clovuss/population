@@ -54,16 +54,12 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	server := http.Server{
 		Addr:      ":8080",
 		Handler:   app.routes(),
 		TLSConfig: nil,
 		ErrorLog:  nil,
 	}
-
-	//fmt.Println(sl[0])
-	//	fmt.Println(sl[1])
 
 	err = server.ListenAndServe()
 	if err != nil {
